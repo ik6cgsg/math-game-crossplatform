@@ -1,0 +1,3 @@
+[submodule "math-resolver-lib"]
+	path = math-resolver-lib
+	url = git@github.com:ik6cgsg/math-resolver-lib.git
