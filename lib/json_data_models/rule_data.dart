@@ -21,24 +21,9 @@ class Rule {
   @JsonKey(defaultValue: 0) final int priority;
   @JsonKey(defaultValue: 1.0) final double weight;
 
-  Rule(
-      this.leftStructureString,
-      this.rightStructureString,
-      this.code,
-      this.nameEn,
-      this.nameRu,
-      this.descriptionShortEn,
-      this.descriptionShortRu,
-      this.descriptionEn,
-      this.descriptionRu,
-      this.normalizationType,
-      this.basedOnTaskContext,
-      this.matchJumbledAndNested,
-      this.isExtending,
-      this.simpleAdditional,
-      this.priority,
-      this.weight
-  );
+  Rule(this.leftStructureString, this.rightStructureString, this.code, this.nameEn, this.nameRu, this.descriptionShortEn,
+      this.descriptionShortRu, this.descriptionEn, this.descriptionRu, this.normalizationType, this.basedOnTaskContext,
+      this.matchJumbledAndNested, this.isExtending, this.simpleAdditional, this.priority, this.weight);
 
   factory Rule.fromJson(Map<String, dynamic> json) => _$RuleFromJson(json);
   Map<String, dynamic> toJson() => _$RuleToJson(this);
@@ -68,7 +53,13 @@ class RulePackage {
   @JsonKey(defaultValue: "") final String descriptionShortRu;
   @JsonKey(defaultValue: "") final String descriptionEn;
   @JsonKey(defaultValue: "") final String descriptionRu;
-  var rulePacks: List<RulePackLink>? = null;
-  var rules: List<JsonObject>? = null;
-  var otherData: JsonElement? = null;
+  @JsonKey(defaultValue: null) final List<RulePackLink>? rulePacks;
+  @JsonKey(defaultValue: null) final List<Rule>? rules;
+  @JsonKey(defaultValue: null) final Object? otherData;
+
+  RulePackage(this.namespaceCode, this.code, this.version, this.nameEn, this.nameRu, this.descriptionShortEn,
+      this.descriptionShortRu, this.descriptionEn, this.descriptionRu, this.rulePacks, this.rules, this.otherData);
+
+  factory RulePackage.fromJson(Map<String, dynamic> json) => _$RulePackageFromJson(json);
+  Map<String, dynamic> toJson() => _$RulePackageToJson(this);
 }

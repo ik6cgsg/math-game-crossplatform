@@ -4,8 +4,9 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:math_game_crossplatform/rule_data.dart';
+import 'package:math_game_crossplatform/json_data_models/rule_data.dart';
 
+import 'json_data_models/taskset_data.dart';
 import 'math_view.dart';
 
 void main() {
@@ -44,15 +45,15 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _tryResolveExpression("((1/2+((cos(x-3/2)*(tg(x)/ctg(x)))/sin(-x+(x+y)/2))*14*sin(x*y/2))/(-(-35+x/2)))^(-1/2)");
+    _tryResolveExpression("((1/2+((cos(x-3/2)*(tg(x)/ctg(x)))/sin(-x+(x+y)/2))*14*sin(x*y/2))/(-(-35+x/2)))^(-1/2)", false);
     _parseGame();
   }
 
-  void _tryResolveExpression(String text) {
+  void _tryResolveExpression(String text, bool st) {
     try {
       _channel.invokeMethod<String>('resolveExpression', <String, dynamic>{
         'expression': text,
-        'structured': false,
+        'structured': st,
       }).then((value) {
         setState(() {
           _expression = value ?? 'failed to resolve';
@@ -68,24 +69,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void _parseGame() {
     DefaultAssetBundle.of(context).loadString("assets/games/global__CheckYourselfCompleteTrigonometry.json").then((value) {
       Map<String, dynamic> json = jsonDecode(value);
-      print("game json len = ${json.length}");
+      var full = FullTaskset.fromJson(json);
+      print("full parsed = ${full}");
+      _tryResolveExpression(full.taskset.tasks[0].originalExpressionStructureString, true);
     });
-    Map<String, dynamic> userMap = jsonDecode("""
-    {
-
-        "code": "(sin(*(2;a)))__to__(/(*(2;tg(a));+(1;^(tg(a);2))))",
-        "priority": 30,
-        "isExtending": false,
-        "simpleAdditional": false,
-        "normalizationType": "SORTED",
-        "basedOnTaskContext": false,
-        "leftStructureString": "(sin(*(2;a)))",
-        "rightStructureString": "(/(*(2;tg(a));+(1;^(tg(a);2))))",
-        "matchJumbledAndNested": false
-    }
-    """);
-    var rule = Rule.fromJson(userMap);
-    print("rule = ${rule.toJson()}");
   }
 
   @override
