@@ -7,6 +7,7 @@ import io.flutter.plugin.common.MethodChannel
 import mathhelper.twf.api.expressionToStructureString
 import mathhelper.utility.math_resolver_lib.MathResolver
 import mathhelper.utility.math_resolver_lib.MathResolverPair
+import mathhelper.utility.math_resolver_lib.OperationType
 
 //import mathresolverlib.android.MathResolverLib
 
@@ -23,7 +24,9 @@ class MainActivity: FlutterActivity() {
                     val structured = call.argument<Boolean>("structured")
                     //val map = hashMapOf(OperationType.DIV to "―", OperationType.MULT to "*", OperationType.MINUS to "-")
                     if (expression != null && structured != null) {
-                        currentExpressionPair = MathResolver.resolveToPlain(expression, structureString = structured)
+                        val map = hashMapOf(OperationType.DIV to "—")
+                        currentExpressionPair = MathResolver.resolveToPlain(expression, structureString = structured,
+                            customSymbolMap = map)
                         result.success(currentExpressionPair.matrix.joinToString("\n"))
                     } else {
                         result.error("resolveExpression", "Bad arguments: ${call.arguments}", null)
