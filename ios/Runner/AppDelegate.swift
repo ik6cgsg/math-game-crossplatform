@@ -11,7 +11,7 @@ import MathResolverLib
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
-        let channel = FlutterMethodChannel(name: "math_helper_util", binaryMessenger: controller.binaryMessenger)
+        let channel = FlutterMethodChannel(name: "mathhelper.games.crossplatform/math_util", binaryMessenger: controller.binaryMessenger)
         channel.setMethodCallHandler({(call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             switch call.method {
             case "resolveExpression":

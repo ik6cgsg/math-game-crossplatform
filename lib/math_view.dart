@@ -1,74 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'math_util.dart' as math_util;
 
 class MathView extends StatefulWidget {
   final String expression;
-  final MethodChannel channel;
+  final double maxWidth;
 
-  const MathView(this.expression, this.channel, {Key? key}) : super(key: key);
+  const MathView(this.expression, this.maxWidth, {Key? key}) : super(key: key);
 
   @override
   State<MathView> createState() => _MathViewState();
 }
 
 class _MathViewState extends State<MathView> {
-  var lt = [0, 0];
-  var rb = [0, 0];
-  double defaultWidth = 10;
-
-  void _tryGetNodeByTouch(int x, int y) {
-    try {
-      widget.channel.invokeMapMethod('getNodeByTouch', <String, dynamic>{
-        "coords": [x, y]
-      }).then((value) {
-        print("_tryGetNodeByTouch got $value");
-        var resMap = value?.cast<String, dynamic>();
-        if (resMap != null) {
-          setState(() {
-            lt = List<int>.from(resMap["lt"]);
-            rb = List<int>.from(resMap["rb"]);
-          });
-        }
-      });
-    } on PlatformException {
-      print("_tryGetNodeByTouch failed");
-    }
-  }
-
-  bool _isInside(List<int> tap, List<int> lt, List<int> rb) =>
-      tap[0] >= lt[0] && tap[0] <= rb[0] && tap[1] >= lt[1] && tap[1] <= rb[1];
-
+  math_util.Point? _ltSelected;
+  math_util.Point? _rbSelected;
+  final double _defaultWidth = 10;
 
   @override
   Widget build(BuildContext context) {
     var lines = widget.expression.split('\n');
-    double width = defaultWidth;
-    var frac = (MediaQuery.of(context).size.width - 40) / (defaultWidth * lines[0].length);
-    if (frac < 1) {
-      width *= frac;
-      print("width changed to $width");
+    double width = _defaultWidth;
+    var ratio = widget.maxWidth / (_defaultWidth * lines[0].length);
+    if (ratio < 1) {
+      width *= ratio;
     }
     return Table(
       //border: TableBorder.all(),
       defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
       defaultColumnWidth: FixedColumnWidth(width),
-      children: lines.asMap().entries.map((ex) {
+      children: lines.asMap().entries.map((line) {
         return TableRow(
-          children: ex.value.split('').asMap().entries.map((symb) {
-            var selected = _isInside([symb.key, ex.key], lt, rb);
+          children: line.value.split('').asMap().entries.map((char) {
+            var current = math_util.Point(char.key, line.key);
+            var selected = false;
+            if (_ltSelected != null && _rbSelected != null) {
+              selected = current.isInside(_ltSelected!, _rbSelected!);
+            }
             return TableCell(
               child: GestureDetector(
                 child: Text(
-                  symb.value,
+                  char.value,
                   style: GoogleFonts.jetBrainsMono(
-                      fontSize: width * 1.69,
-                      height: 0.69,
-                      color: selected ? Colors.teal : Colors.black,
-                      fontWeight: selected ? FontWeight.bold : FontWeight.normal),
+                    fontSize: width * 1.69,
+                    height: 0.69,
+                    color: selected ? Colors.teal : Colors.black,
+                    fontWeight: selected ? FontWeight.bold : FontWeight.normal),
                 ),
                 onTap: () {
-                  _tryGetNodeByTouch(symb.key, ex.key);
+                  math_util.getNodeByTouch(current).then((value) {
+                    print('getNodeByTouch($current) got $value');
+                    setState(() {
+                      _ltSelected = value?[0];
+                      _rbSelected = value?[1];
+                    });
+                  });
                 },
                 onLongPress: () {
                   HapticFeedback.mediumImpact();
@@ -81,3 +68,4 @@ class _MathViewState extends State<MathView> {
     );
   }
 }
+

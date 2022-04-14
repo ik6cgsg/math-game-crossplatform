@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mathhelper.games.math_game_crossplatform">
    <application
-        android:label="math_game_crossplatform"
+        android:label="Mathcross"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

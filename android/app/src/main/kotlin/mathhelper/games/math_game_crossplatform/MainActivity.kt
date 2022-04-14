@@ -9,10 +9,8 @@ import mathhelper.utility.math_resolver_lib.MathResolver
 import mathhelper.utility.math_resolver_lib.MathResolverPair
 import mathhelper.utility.math_resolver_lib.OperationType
 
-//import mathresolverlib.android.MathResolverLib
-
 class MainActivity: FlutterActivity() {
-    private val CHANNEL = "math_helper_util"
+    private val CHANNEL = "mathhelper.games.crossplatform/math_util"
     private lateinit var currentExpressionPair: MathResolverPair
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
