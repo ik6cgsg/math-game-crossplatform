@@ -5,13 +5,16 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:math_game_crossplatform/json_data_models/rule_data.dart';
+import 'package:math_game_crossplatform/logger.dart';
 
 import 'json_data_models/task_data.dart';
 import 'json_data_models/taskset_data.dart';
 import 'math_util.dart' as math_util;
+import 'math_util.dart';
 import 'math_view.dart';
 
 void main() {
+  initLogger();
   runApp(const MyApp());
 }
 
@@ -41,7 +44,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _expression = "expression";
+  //Task? _task;
+  String _expr = "expression";
+  NodeSelectionInfo? _info;
 
   @override
   void initState() {
@@ -50,18 +55,33 @@ class _MyHomePageState extends State<MyHomePage> {
     _parseGame();
   }
 
-  void _parseGame() {
-    DefaultAssetBundle.of(context).loadString("assets/games/global__CheckYourselfCompleteTrigonometry.json").then((value) {
-      Map<String, dynamic> json = jsonDecode(value);
-      var full = FullTaskset.fromJson(json);
-      _loadLevel(full.taskset.tasks[0]);
-    });
+  Future<void> _parseGame() async {
+    var value = await DefaultAssetBundle.of(context).loadString("assets/games/global__CheckYourselfCompleteTrigonometry.json");
+    Map<String, dynamic> json = jsonDecode(value);
+    var full = FullTaskset.fromJson(json);
+    await _loadLevel(full.taskset.tasks[0], full.rulePacks);
+    setState((){});
   }
 
-  void _loadLevel(Task task) {
-    math_util.resolveExpression(task.originalExpressionStructureString, true).then((value) {
+  Future<void> _loadLevel(Task task, List<RulePackage> allPacks) async {
+    Map<String, RulePackage> allPacksMap = {};
+    for (var e in allPacks) {
+      allPacksMap[e.code] = e;
+    }
+    //_task = task;
+    _expr = task.originalExpressionStructureString;//await math_util.resolveExpression(task.originalExpressionStructureString, true);
+    var allRules = {...?task.rules};
+    task.rulePacks?.forEach((element) {
+      var packRules = allPacksMap[element.rulePackCode]?.getAllRules(allPacksMap);
+      allRules = {...allRules, ...?packRules};
+    });
+    math_util.compileConfiguration(allRules);
+  }
+
+  void _tapHandle(Point current) {
+    math_util.getNodeByTouch(current).then((value) {
       setState(() {
-        _expression = value;
+        _info = value;
       });
     });
   }
@@ -70,15 +90,39 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     double padding = 20;
     return Scaffold(
-      body: Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.all(padding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            MathView(_expression, MediaQuery.of(context).size.width - padding * 2),
-          ],
-        ),
+      body: Column(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height / 2,
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(left: padding, right: padding),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                MathView(
+                  _expr,
+                  MediaQuery.of(context).size.width - padding * 2,
+                  tapHandle: _tapHandle,
+                  ltSelected: _info?.lt,
+                  rbSelected: _info?.rb
+                )
+              ],
+            ),
+          ),
+          Container(
+            height: MediaQuery.of(context).size.height / 2,
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(left: padding, right: padding),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _info?.results.map((e) {
+                  return MathView(e, MediaQuery.of(context).size.width - padding * 2);
+                }).toList() ?? [Text("no rules")],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

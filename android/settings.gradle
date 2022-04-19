@@ -11,4 +11,4 @@ assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
 apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"
 
 include ':MathResolverLib'
-project(':MathResolverLib').projectDir = new File(rootProject.projectDir, "../math-resolver-lib/MathResolverLib")
+project(':MathResolverLib').projectDir = new File(settingsDir, "../math-resolver-lib/MathResolverLib")

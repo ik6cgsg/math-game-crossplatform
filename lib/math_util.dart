@@ -1,4 +1,6 @@
 import 'package:flutter/services.dart';
+import 'package:math_game_crossplatform/logger.dart';
+import 'json_data_models/rule_data.dart';
 
 const MethodChannel _channel = MethodChannel('mathhelper.games.crossplatform/math_util');
 
@@ -13,21 +15,33 @@ class Point {
   String toString() => '($x, $y)';
 }
 
-Future<String> resolveExpression(String expressionStr, bool isStructured) async {
+Future<String> resolveExpression(String expressionStr, bool isStructured, bool isRule) async {
+  log.info('resolveExpression($expressionStr, $isStructured)');
   String res = '';
   try {
     res = await _channel.invokeMethod<String>('resolveExpression', <String, dynamic>{
       'expression': expressionStr,
       'structured': isStructured,
+      'isRule': isRule
     }) ?? 'failed';
   } on PlatformException {
+    log.info('resolveExpression failed with PlatformException');
     res = 'failed';
   }
   return res;
 }
 
-Future<List?> getNodeByTouch(Point tap) async {
-  List? res;
+class NodeSelectionInfo {
+  final String expression;
+  final Point lt, rb;
+  final List<String> results;
+
+  NodeSelectionInfo(this.expression, this.lt, this.rb, this.results);
+}
+
+Future<NodeSelectionInfo?> getNodeByTouch(Point tap) async {
+  log.info('getNodeByTouch($tap)');
+  NodeSelectionInfo? res;
   try {
     var invokeRes = await _channel.invokeMapMethod('getNodeByTouch', <String, dynamic>{
       "coords": [tap.x, tap.y]
@@ -36,10 +50,31 @@ Future<List?> getNodeByTouch(Point tap) async {
     if (map != null) {
       var lt = List<int>.from(map["lt"]);
       var rb = List<int>.from(map["rb"]);
-      res = [Point(lt[0], lt[1]), Point(rb[0], rb[1])];
+      var results = List<String>.from(map["results"]);
+      log.info('getNodeByTouch results = $results');
+      res = NodeSelectionInfo(
+          map["node"],
+          Point(lt[0], lt[1]),
+          Point(rb[0], rb[1]),
+          results
+      );
     }
   } on PlatformException {
+    log.info('getNodeByTouch failed with PlatformException');
     res = null;
   }
   return res;
+}
+
+void compileConfiguration(Set<Rule> rules) {
+  log.info('compileConfiguration(); size == ${rules.length}');
+  try {
+    _channel.invokeMethod('compileConfiguration', <String, dynamic>{
+      "rules": rules.map((e) => e.toJson()).toList()
+    }).then((v){
+      log.info('compileConfiguration finished');
+    });
+  } on PlatformException {
+    log.info('compileConfiguration failed with PlatformException');
+  }
 }

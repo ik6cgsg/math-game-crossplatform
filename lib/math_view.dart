@@ -1,70 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'math_util.dart' as math_util;
+import 'math_util.dart';
 
 class MathView extends StatefulWidget {
   final String expression;
   final double maxWidth;
+  final void Function(Point)? tapHandle;
+  final Point? ltSelected;
+  final Point? rbSelected;
 
-  const MathView(this.expression, this.maxWidth, {Key? key}) : super(key: key);
+  const MathView(
+      this.expression, this.maxWidth, {Key? key, this.tapHandle, this.ltSelected, this.rbSelected}
+  ): super(key: key);
 
   @override
   State<MathView> createState() => _MathViewState();
 }
 
 class _MathViewState extends State<MathView> {
-  math_util.Point? _ltSelected;
-  math_util.Point? _rbSelected;
   final double _defaultWidth = 10;
+  String _output = "loading...";
+  String _curExpr = "";
+
+  void _resolve() {
+    if (_curExpr != widget.expression) {
+      _curExpr = widget.expression;
+      resolveExpression(_curExpr, true, widget.tapHandle == null).then((res) {
+        setState(() {
+          _output = res;
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    var lines = widget.expression.split('\n');
+    _resolve();
+    var lines = _output.split('\n');
     double width = _defaultWidth;
     var ratio = widget.maxWidth / (_defaultWidth * lines[0].length);
     if (ratio < 1) {
       width *= ratio;
     }
-    return Table(
-      //border: TableBorder.all(),
-      defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
-      defaultColumnWidth: FixedColumnWidth(width),
-      children: lines.asMap().entries.map((line) {
-        return TableRow(
-          children: line.value.split('').asMap().entries.map((char) {
-            var current = math_util.Point(char.key, line.key);
-            var selected = false;
-            if (_ltSelected != null && _rbSelected != null) {
-              selected = current.isInside(_ltSelected!, _rbSelected!);
-            }
-            return TableCell(
-              child: GestureDetector(
-                child: Text(
-                  char.value,
-                  style: GoogleFonts.jetBrainsMono(
-                    fontSize: width * 1.69,
-                    height: 0.69,
-                    color: selected ? Colors.teal : Colors.black,
-                    fontWeight: selected ? FontWeight.bold : FontWeight.normal),
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: Table(
+        //border: TableBorder.all(),
+        defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
+        defaultColumnWidth: FixedColumnWidth(width),
+        children: lines.asMap().entries.map((line) {
+          return TableRow(
+            children: line.value.split('').asMap().entries.map((char) {
+              var current = Point(char.key, line.key);
+              var selected = false;
+              if (widget.ltSelected != null && widget.rbSelected != null) {
+                selected = current.isInside(widget.ltSelected!, widget.rbSelected!);
+              }
+              return TableCell(
+                child: GestureDetector(
+                  child: Text(
+                    char.value,
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: width * 1.69,
+                      height: 0.69,
+                      color: selected ? Colors.teal : Colors.black,
+                      fontWeight: selected ? FontWeight.bold : FontWeight.normal),
+                  ),
+                  onTap: () {
+                    widget.tapHandle?.call(current);
+                  },
+                  onLongPress: () {
+                    HapticFeedback.mediumImpact();
+                  },
                 ),
-                onTap: () {
-                  math_util.getNodeByTouch(current).then((value) {
-                    print('getNodeByTouch($current) got $value');
-                    setState(() {
-                      _ltSelected = value?[0];
-                      _rbSelected = value?[1];
-                    });
-                  });
-                },
-                onLongPress: () {
-                  HapticFeedback.mediumImpact();
-                },
-              ),
-            );
-          }).toList(),
-        );
-      }).toList(),
+              );
+            }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }

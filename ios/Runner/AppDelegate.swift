@@ -5,6 +5,7 @@ import MathResolverLib
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
     var currentExpressionPair: MathResolverPair?
+    var currentSelectedAtom: ExpressionNode?
     
     override func application(
         _ application: UIApplication,
@@ -35,6 +36,7 @@ import MathResolverLib
                         "lt": [nodeCoords.lt.x, nodeCoords.lt.y],
                         "rb": [nodeCoords.rb.x, nodeCoords.rb.y]
                     ]
+                    self.currentSelectedAtom = nodeCoords.node
                     result(msg)
                 } else {
                     result(FlutterError(code: "getNodeByTouch", message: "Node not found for x: \(coords?[0]), y: \(coords?[1])", details: nil))

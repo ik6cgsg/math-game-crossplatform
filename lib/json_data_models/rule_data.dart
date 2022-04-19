@@ -61,5 +61,16 @@ class RulePackage {
       this.descriptionShortRu, this.descriptionEn, this.descriptionRu, this.rulePacks, this.rules, this.otherData);
 
   factory RulePackage.fromJson(Map<String, dynamic> json) => _$RulePackageFromJson(json);
+
   Map<String, dynamic> toJson() => _$RulePackageToJson(this);
+
+  Set<Rule>? getAllRules(Map<String, RulePackage> allPacks) {
+    var res = {...?rules};
+    rulePacks?.forEach((element) {
+      var fullPack = allPacks[element.rulePackCode];
+      var rules = fullPack?.getAllRules(allPacks);
+      res = {...res, ...?rules};
+    });
+    return res;
+  }
 }
