@@ -78,3 +78,17 @@ void compileConfiguration(Set<Rule> rules) {
     log.info('compileConfiguration failed with PlatformException');
   }
 }
+
+Future<String> performSubstitution(int index) async {
+  log.info('performSubstitution($index)');
+  String res = '';
+  try {
+    res = await _channel.invokeMethod<String>('performSubstitution', <String, dynamic>{
+      'index': index
+    }) ?? 'failed';
+  } on PlatformException {
+    log.info('resolveExpression failed with PlatformException');
+    res = 'failed';
+  }
+  return res;
+}

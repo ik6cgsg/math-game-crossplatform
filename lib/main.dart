@@ -1,17 +1,13 @@
 import 'dart:convert';
 import 'dart:ui';
-
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:math_game_crossplatform/json_data_models/rule_data.dart';
 import 'package:math_game_crossplatform/logger.dart';
-
 import 'json_data_models/task_data.dart';
 import 'json_data_models/taskset_data.dart';
-import 'math_util.dart' as math_util;
 import 'math_util.dart';
-import 'math_view.dart';
+import 'views/main_math_view.dart';
+import 'views/rule_math_view.dart';
 
 void main() {
   initLogger();
@@ -75,13 +71,22 @@ class _MyHomePageState extends State<MyHomePage> {
       var packRules = allPacksMap[element.rulePackCode]?.getAllRules(allPacksMap);
       allRules = {...allRules, ...?packRules};
     });
-    math_util.compileConfiguration(allRules);
+    compileConfiguration(allRules);
   }
 
-  void _tapHandle(Point current) {
-    math_util.getNodeByTouch(current).then((value) {
+  void _nodeSelected(Point current) {
+    getNodeByTouch(current).then((value) {
       setState(() {
         _info = value;
+      });
+    });
+  }
+
+  void _ruleSelected(int i) {
+    performSubstitution(i).then((value) {
+      setState(() {
+        _expr = value;
+        _info = null;
       });
     });
   }
@@ -99,10 +104,10 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                MathView(
+                MainMathView(
                   _expr,
                   MediaQuery.of(context).size.width - padding * 2,
-                  tapHandle: _tapHandle,
+                  _nodeSelected,
                   ltSelected: _info?.lt,
                   rbSelected: _info?.rb
                 )
@@ -116,8 +121,11 @@ class _MyHomePageState extends State<MyHomePage> {
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: _info?.results.map((e) {
-                  return MathView(e, MediaQuery.of(context).size.width - padding * 2);
+                children: _info?.results.asMap().entries.map((pair) {
+                  return InkWell(
+                    child: RuleMathView(pair.value, MediaQuery.of(context).size.width - padding * 2),
+                    onTap: () => _ruleSelected(pair.key),
+                  );
                 }).toList() ?? [Text("no rules")],
               ),
             ),

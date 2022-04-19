@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'math_util.dart';
+import '../math_util.dart';
 
-class MathView extends StatefulWidget {
+class MainMathView extends StatefulWidget {
   final String expression;
   final double maxWidth;
-  final void Function(Point)? tapHandle;
+  final void Function(Point) tapHandle;
   final Point? ltSelected;
   final Point? rbSelected;
 
-  const MathView(
-      this.expression, this.maxWidth, {Key? key, this.tapHandle, this.ltSelected, this.rbSelected}
+  const MainMathView(
+      this.expression, this.maxWidth, this.tapHandle, {Key? key, this.ltSelected, this.rbSelected}
   ): super(key: key);
 
   @override
-  State<MathView> createState() => _MathViewState();
+  State<MainMathView> createState() => _MainMathViewState();
 }
 
-class _MathViewState extends State<MathView> {
+class _MainMathViewState extends State<MainMathView> {
   final double _defaultWidth = 10;
   String _output = "loading...";
   String _curExpr = "";
@@ -68,7 +68,7 @@ class _MathViewState extends State<MathView> {
                       fontWeight: selected ? FontWeight.bold : FontWeight.normal),
                   ),
                   onTap: () {
-                    widget.tapHandle?.call(current);
+                    widget.tapHandle(current);
                   },
                   onLongPress: () {
                     HapticFeedback.mediumImpact();
