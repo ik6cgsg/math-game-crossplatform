@@ -43,6 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
   //Task? _task;
   String _expr = "expression";
   NodeSelectionInfo? _info;
+  double _dy = 0;
+  final double _dividerHeight = 20;
 
   @override
   void initState() {
@@ -96,35 +98,58 @@ class _MyHomePageState extends State<MyHomePage> {
     double padding = 20;
     return Scaffold(
       body: Column(
+        //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Container(
-            height: MediaQuery.of(context).size.height / 2,
+            height: MediaQuery.of(context).size.height / 2 - _dividerHeight / 2 + _dy,
+            width: MediaQuery.of(context).size.width,
             alignment: Alignment.center,
             padding: EdgeInsets.only(left: padding, right: padding),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                MainMathView(
-                  _expr,
-                  MediaQuery.of(context).size.width - padding * 2,
-                  _nodeSelected,
-                  ltSelected: _info?.lt,
-                  rbSelected: _info?.rb
-                )
-              ],
+            child: MainMathView(
+              _expr,
+              MediaQuery.of(context).size.width - padding * 2,
+              _nodeSelected,
+              ltSelected: _info?.lt,
+              rbSelected: _info?.rb
+            )
+          ),
+          GestureDetector(
+            child: Container(
+              height: _dividerHeight,
+              width: _dividerHeight * 4,
+              decoration: BoxDecoration(
+                border: Border.all(),
+                borderRadius: BorderRadius.all(Radius.circular(40)),
+                color: Colors.teal
+              ),
+              //color: Colors.teal,
             ),
+            onVerticalDragUpdate: (details) {
+              setState(() {
+                _dy += details.delta.dy;
+              });
+            },
           ),
           Container(
-            height: MediaQuery.of(context).size.height / 2,
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.teal),
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+            ),
+            height: MediaQuery.of(context).size.height / 2 - _dividerHeight / 2 - _dy,
+            width: MediaQuery.of(context).size.width,
             alignment: Alignment.center,
             padding: EdgeInsets.only(left: padding, right: padding),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: _info?.results.asMap().entries.map((pair) {
-                  return InkWell(
-                    child: RuleMathView(pair.value, MediaQuery.of(context).size.width - padding * 2),
-                    onTap: () => _ruleSelected(pair.key),
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 5, bottom: 5),
+                    child: InkWell(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      child: RuleMathView(pair.value, MediaQuery.of(context).size.width - padding * 2),
+                      onTap: () => _ruleSelected(pair.key),
+                    ),
                   );
                 }).toList() ?? [Text("no rules")],
               ),

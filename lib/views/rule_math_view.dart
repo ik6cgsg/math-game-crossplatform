@@ -35,14 +35,24 @@ class _RuleMathViewState extends State<RuleMathView> {
   Widget build(BuildContext context) {
     _resolve();
     return Container(
-      padding: EdgeInsets.all(20),
-      child: Text(
-        _output,
-        style: GoogleFonts.jetBrainsMono(
-          fontSize: 13,
-          height: 0.69,
-          color: Colors.black,
-          fontWeight: FontWeight.normal,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        border: Border.all(),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
+      padding: EdgeInsets.all(10),
+      //margin: EdgeInsets.only(top: 5,bottom: 5),
+      alignment: Alignment.center,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Text(
+          _output,
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 13,
+            height: 0.69,
+            color: Colors.black,
+            fontWeight: FontWeight.normal,
+          ),
         ),
       ),
     );

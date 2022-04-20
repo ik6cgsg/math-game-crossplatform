@@ -44,7 +44,7 @@ class _MainMathViewState extends State<MainMathView> {
       width *= ratio;
     }
     return Container(
-      padding: EdgeInsets.all(20),
+      //padding: EdgeInsets.all(20),
       child: Table(
         //border: TableBorder.all(),
         defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
