@@ -61,7 +61,7 @@ class _MainMathViewState extends State<MainMathView> {
                 child: GestureDetector(
                   child: Text(
                     char.value,
-                    style: GoogleFonts.jetBrainsMono(
+                    style: GoogleFonts.notoSansMono(
                       fontSize: width * 1.69,
                       height: 0.69,
                       color: selected ? Colors.teal : Colors.black,

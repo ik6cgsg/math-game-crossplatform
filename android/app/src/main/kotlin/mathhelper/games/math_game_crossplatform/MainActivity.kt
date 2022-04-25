@@ -39,8 +39,7 @@ class MainActivity: FlutterActivity() {
         val isRule = call.argument<Boolean>("isRule") ?: false
         //val map = hashMapOf(OperationType.DIV to "―", OperationType.MULT to "*", OperationType.MINUS to "-")
         if (expression != null) {
-            val map = hashMapOf(OperationType.DIV to "—")
-            val pair = MathResolver.resolveToPlain(expression, structureString = structured, customSymbolMap = map)
+            val pair = MathResolver.resolveToPlain(expression, structureString = structured)
             if (!isRule) {
                 currentExpressionPair = pair
             }
