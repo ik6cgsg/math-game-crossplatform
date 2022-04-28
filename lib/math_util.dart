@@ -92,3 +92,19 @@ Future<String> performSubstitution(int index) async {
   }
   return res;
 }
+
+Future<bool> checkEnd(String expression, String goal, String pattern) async {
+  log.info('checkEnd($expression)');
+  bool res = false;
+  try {
+    res = await _channel.invokeMethod<bool>('checkEnd', <String, dynamic>{
+      'expression': expression,
+      'goal': goal,
+      'pattern': pattern
+    }) ?? false;
+  } on PlatformException {
+    log.info('checkEnd failed with PlatformException');
+    res = false;
+  }
+  return res;
+}

@@ -28,6 +28,7 @@ class MainActivity: FlutterActivity() {
                 "getNodeByTouch" -> getNodeByTouch(call, result)
                 "compileConfiguration" -> compileConfiguration(call, result)
                 "performSubstitution" -> performSubstitution(call, result)
+                "checkEnd" -> checkEnd(call, result)
                 else -> result.notImplemented()
             }
         }
@@ -119,13 +120,23 @@ class MainActivity: FlutterActivity() {
         val i = call.argument<Int>("index")
         val resExpr = ruleIndToResult?.get(i)
         if (resExpr != null) {
-            //val map = hashMapOf(OperationType.DIV to "—")
-            //val pair = MathResolver.resolveToPlain(resExpr, customSymbolMap = map)
-            //currentExpressionPair = pair
             ruleIndToResult = null
             res.success(expressionToStructureString(resExpr))
         } else {
             res.error("performSubstitution", "Bad arguments: ${call.arguments}", null)
+        }
+    }
+
+    private fun checkEnd(call: MethodCall, res: MethodChannel.Result) {
+        val expression = call.argument<String>("expression") ?: ""
+        val goal = call.argument<String>("goal") ?: ""
+        val pattern = call.argument<String>("pattern") ?: ""
+        if (pattern.isBlank()) {
+            res.success(expression == goal)
+        } else {
+            val ex = structureStringToExpression(expression)
+            val pat = stringToExpressionStructurePattern(pattern)
+            res.success(compareByPattern(ex, pat))
         }
     }
 }

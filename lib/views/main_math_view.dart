@@ -18,27 +18,29 @@ class MainMathView extends StatefulWidget {
 }
 
 class _MainMathViewState extends State<MainMathView> {
-  double _width = 10;
+  static const double _widthMin = 5;
+  static const double _widthMax = 15;
+  double _width = _widthMax;
   String _output = "";
   String _curExpr = "";
   bool _loaded = false;
 
-  void _updateWidth() {
+  void _updateWidth(double maxW) {
     var lines = _output.split('\n');
-    var ratio = MediaQuery.of(context).size.width / (_width * lines[0].length);
-    if (ratio < 1) {
-      _width *= ratio;
+    var ratio = maxW / (_width * lines[0].length);
+    var w = _width * ratio;
+    if (w >= _widthMin && w <= _widthMax) {
+      _width = w;
     }
   }
 
   void _updateExpression() {
     if (_curExpr != widget.expression) {
-      //setState(() => _loaded = false);
       _curExpr = widget.expression;
       resolveExpression(_curExpr, true, false).then((res) {
           _output = res;
-          _updateWidth();
-          setState(() => _loaded = true);
+          _loaded = true;
+          setState(() {});
       });
     }
   }
@@ -48,8 +50,8 @@ class _MainMathViewState extends State<MainMathView> {
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
         //height: MediaQuery.of(context).size.width / 5,
-        child: const LinearProgressIndicator(
-          color: Colors.teal,
+        child: LinearProgressIndicator(
+          color: Theme.of(context).primaryColor,
           minHeight: 6,
         ),
       ),
@@ -61,39 +63,40 @@ class _MainMathViewState extends State<MainMathView> {
     _updateExpression();
     return !_loaded ?
     _loadingBody(context) :
-    Table(
-      defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
-      defaultColumnWidth: FixedColumnWidth(_width),
-      children: _output.split('\n').asMap().entries.map((line) {
-        return TableRow(
-          children: line.value.split('').asMap().entries.map((char) {
-            var current = Point(char.key, line.key);
-            var selected = false;
-            if (widget.ltSelected != null && widget.rbSelected != null) {
-              selected = current.isInside(widget.ltSelected!, widget.rbSelected!);
-            }
-            return TableCell(
-              child: GestureDetector(
-                child: Text(
-                  char.value,
-                  style: GoogleFonts.notoSansMono(
-                    fontSize: _width * 1.69,
-                    height: 0.69,
-                    color: selected ? Colors.teal : Colors.black,
-                    fontWeight: selected ? FontWeight.bold : FontWeight.normal),
+    LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+      _updateWidth(constraints.maxWidth);
+      return Table(
+        defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
+        defaultColumnWidth: FixedColumnWidth(_width),
+        children: _output.split('\n').asMap().entries.map((line) {
+          return TableRow(
+            children: line.value.split('').asMap().entries.map((char) {
+              var current = Point(char.key, line.key);
+              var selected = false;
+              if (widget.ltSelected != null && widget.rbSelected != null) {
+                selected = current.isInside(widget.ltSelected!, widget.rbSelected!);
+              }
+              return TableCell(
+                child: GestureDetector(
+                  child: Text(
+                    char.value,
+                    style: selected ?
+                    Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: _width * 1.69) :
+                    Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: _width * 1.69),
+                  ),
+                  onTap: () {
+                    widget.tapHandle(current);
+                  },
+                  onLongPress: () {
+                    HapticFeedback.mediumImpact();
+                  },
                 ),
-                onTap: () {
-                  widget.tapHandle(current);
-                },
-                onLongPress: () {
-                  HapticFeedback.mediumImpact();
-                },
-              ),
-            );
-          }).toList(),
-        );
-      }).toList(),
-    );
+              );
+            }).toList(),
+          );
+        }).toList(),
+      );
+    });
   }
 }
 

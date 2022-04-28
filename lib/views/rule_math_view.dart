@@ -39,8 +39,8 @@ class _RuleMathViewState extends State<RuleMathView> {
       padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
       width: MediaQuery.of(context).size.width,
       height: 35,
-      child: const LinearProgressIndicator(
-        color: Colors.teal
+      child: LinearProgressIndicator(
+        color: Theme.of(context).primaryColor
       ),
     );
   }
@@ -68,12 +68,7 @@ class _RuleMathViewState extends State<RuleMathView> {
             padding: const EdgeInsets.all(10),
             child: Text(
               _output,
-              style: GoogleFonts.notoSansMono(
-                fontSize: 13,
-                height: 0.69,
-                color: Colors.black,
-                fontWeight: FontWeight.normal,
-              ),
+              style: Theme.of(context).textTheme.bodyText1
             ),
           ),
         ),
