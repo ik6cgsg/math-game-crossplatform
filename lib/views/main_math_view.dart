@@ -18,21 +18,10 @@ class MainMathView extends StatefulWidget {
 }
 
 class _MainMathViewState extends State<MainMathView> {
-  static const double _widthMin = 5;
-  static const double _widthMax = 15;
-  double _width = _widthMax;
+  final double _width = 10;
   String _output = "";
   String _curExpr = "";
   bool _loaded = false;
-
-  void _updateWidth(double maxW) {
-    var lines = _output.split('\n');
-    var ratio = maxW / (_width * lines[0].length);
-    var w = _width * ratio;
-    if (w >= _widthMin && w <= _widthMax) {
-      _width = w;
-    }
-  }
 
   void _updateExpression() {
     if (_curExpr != widget.expression) {
@@ -63,40 +52,38 @@ class _MainMathViewState extends State<MainMathView> {
     _updateExpression();
     return !_loaded ?
     _loadingBody(context) :
-    LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      _updateWidth(constraints.maxWidth);
-      return Table(
-        defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
-        defaultColumnWidth: FixedColumnWidth(_width),
-        children: _output.split('\n').asMap().entries.map((line) {
-          return TableRow(
-            children: line.value.split('').asMap().entries.map((char) {
-              var current = Point(char.key, line.key);
-              var selected = false;
-              if (widget.ltSelected != null && widget.rbSelected != null) {
-                selected = current.isInside(widget.ltSelected!, widget.rbSelected!);
-              }
-              return TableCell(
-                child: GestureDetector(
-                  child: Text(
-                    char.value,
-                    style: selected ?
-                    Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: _width * 1.69) :
-                    Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: _width * 1.69),
-                  ),
-                  onTap: () {
-                    widget.tapHandle(current);
-                  },
-                  onLongPress: () {
-                    HapticFeedback.mediumImpact();
-                  },
+    Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
+      defaultColumnWidth: FixedColumnWidth(_width),
+      children: _output.split('\n').asMap().entries.map((line) {
+        return TableRow(
+          children: line.value.split('').asMap().entries.map((char) {
+            var current = Point(char.key, line.key);
+            var selected = false;
+            if (widget.ltSelected != null && widget.rbSelected != null) {
+              selected = current.isInside(widget.ltSelected!, widget.rbSelected!);
+            }
+            return TableCell(
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                child: Text(
+                  char.value,
+                  style: selected ?
+                  Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: _width * 1.69) :
+                  Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: _width * 1.69),
                 ),
-              );
-            }).toList(),
-          );
-        }).toList(),
-      );
-    });
+                onTap: () {
+                  widget.tapHandle(current);
+                },
+                onLongPress: () {
+                  HapticFeedback.mediumImpact();
+                },
+              ),
+            );
+          }).toList(),
+        );
+      }).toList(),
+    );
   }
 }
 

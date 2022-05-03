@@ -21,6 +21,7 @@ import MathResolverLib
             case "getNodeByTouch": self.getNodeByTouch(call, result)
             case "compileConfiguration": self.compileConfiguration(call, result)
             case "performSubstitution": self.performSubstitution(call, result)
+            case "checkEnd": self.checkEnd(call, result)
             default: result(FlutterMethodNotImplemented)
             }
         })
@@ -126,6 +127,23 @@ import MathResolverLib
             result(ExpressionParserAPIKt.expressionToStructureString(expressionNode: resExpr))
         } else {
             result(FlutterError(code: "performSubstitution", message: "Bad arguments: ${call.arguments}", details: nil))
+        }
+    }
+    
+    private func checkEnd(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let args = call.arguments as? [String: String]
+        if let expression = args?["expression"], let goal = args?["goal"], let pattern = args?["pattern"] {
+            if pattern.isEmpty {
+                result(expression == goal)
+            } else {
+                let base = FunctionConfiguration(scopeFilter: [], notChangesOnVariablesInComparisonFunctionFilter: [])
+                let ex = ExpressionParserAPIKt.structureStringToExpression(structureString: expression, scope: "",
+                    functionConfiguration: base)
+                let pat = ExpressionParserAPIKt.stringToExpressionStructurePattern(string: pattern, scope: "", functionConfiguration: base)
+                result(ExpressionComparisonsAPIKt.compareByPattern(expression: ex, pattern: pat))
+            }
+        } else {
+            result(FlutterError(code: "checkEnd", message: "Bad arguments: ${call.arguments}", details: nil))
         }
     }
 }

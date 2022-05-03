@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class TaskDescriptionView extends StatelessWidget {
-  static const double _padding = 20;
   final String shortDescription;
   final String goalExpresion;
 
@@ -9,23 +8,35 @@ class TaskDescriptionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: _padding, right: _padding, top: _padding / 2, bottom: _padding / 2),
-      child: Column(
-        children: [
-          Text(
-            shortDescription,
-            style: Theme.of(context).textTheme.headline1
-          ),
-          const Spacer(),
-          goalExpresion.isNotEmpty ?
-          Text(
-            goalExpresion,
-            style: Theme.of(context).textTheme.bodyText1
-          ) :
-          Container()
-        ]
-      )
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+      elevation: 0,
+      color: Theme.of(context).primaryColor.withAlpha(20),
+      //shadowColor: Theme.of(context).primaryColor.withAlpha(20),
+      margin: const EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 5),
+      child: ListView(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          children: [
+            const SizedBox(height: 10,),
+            Text(
+              shortDescription,
+              style: Theme.of(context).textTheme.headline1,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10,),
+            goalExpresion.isNotEmpty ?
+            Text(
+              goalExpresion,
+              style: Theme.of(context).textTheme.bodyText1,
+              textAlign: TextAlign.center,
+            ) :
+            Container(),
+            goalExpresion.isNotEmpty ? const SizedBox(height: 10,) : Container(),
+          ]
+        )
     );
   }
 }

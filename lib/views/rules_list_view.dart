@@ -9,13 +9,15 @@ class RulesListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      return Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Theme.of(context).primaryColor, width: 2),
-          borderRadius: const BorderRadius.all(Radius.circular(10))
-        ),
-        width: constraints.maxWidth,
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5),
+      ),
+      elevation: 0,
+      color: Theme.of(context).primaryColor.withAlpha(20),
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      child: Container(
+        padding: const EdgeInsets.all(5.0),
         alignment: Alignment.center,
         child: SingleChildScrollView(
           child: Column(
@@ -25,7 +27,7 @@ class RulesListView extends StatelessWidget {
             }).toList(),
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }

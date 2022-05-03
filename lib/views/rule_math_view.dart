@@ -18,7 +18,7 @@ class RuleMathView extends StatefulWidget {
 }
 
 class _RuleMathViewState extends State<RuleMathView> {
-  static const double _borderRadius = 10;
+  static const double _borderRadius = 5;
   String _output = "";
   String _curExpr = "";
   bool _loaded = false;
@@ -48,32 +48,34 @@ class _RuleMathViewState extends State<RuleMathView> {
   @override
   Widget build(BuildContext context) {
     _updateExpression();
-    return !_loaded ?
-    _loadingBody(context) :
-    Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-      child: InkWell(
-        borderRadius: const BorderRadius.all(Radius.circular(_borderRadius)),
-        onTap: widget.onTap,
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            border: Border.all(),
-            borderRadius: const BorderRadius.all(Radius.circular(_borderRadius)),
-          ),
-          alignment: Alignment.center,
-          //margin: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.all(10),
-            child: Text(
-              _output,
-              style: Theme.of(context).textTheme.bodyText1
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+      return !_loaded ?
+      _loadingBody(context) :
+      Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_borderRadius),
+        ),
+        color: Colors.grey.shade100,
+        elevation: 5,
+        margin: const EdgeInsets.only(top: 3, bottom: 3),
+        child: InkWell(
+          borderRadius: const BorderRadius.all(Radius.circular(_borderRadius)),
+          onTap: widget.onTap,
+          child:  Container(
+            width: constraints.maxWidth,
+            alignment: Alignment.center,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                _output,
+                style: Theme.of(context).textTheme.bodyText1
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
