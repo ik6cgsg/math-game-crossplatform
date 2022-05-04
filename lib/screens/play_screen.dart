@@ -50,7 +50,7 @@ class _PlayScreenState extends State<PlayScreen> {
               tooltip: 'Restart level',
               onPressed: () {
                 levelProvider.unload();
-                Navigator.pushReplacementNamed(context, PlayScreen.routeName);
+                //Navigator.pushReplacementNamed(context, PlayScreen.routeName);
               },
             ),
             IconButton(

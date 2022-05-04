@@ -24,6 +24,26 @@ class _TaskDescriptionViewState extends State<TaskDescriptionView> {
     }
   }
 
+  List<Widget> _children(BuildContext context, String descr) {
+    return [
+      const SizedBox(height: 10, width: 10,),
+      Text(
+        descr,
+        style: Theme.of(context).textTheme.headline1,
+        textAlign: TextAlign.center,
+      ),
+      const SizedBox(height: 10, width: 10,),
+      _output.isNotEmpty ?
+      Text(
+        _output,
+        style: Theme.of(context).textTheme.bodyText1,
+        textAlign: TextAlign.center,
+      ) :
+      Container(),
+      _output.isNotEmpty ? const SizedBox(height: 10, width: 10,) : Container(),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final levelProvider = Provider.of<LevelProvider>(context);
@@ -34,29 +54,23 @@ class _TaskDescriptionViewState extends State<TaskDescriptionView> {
       ),
       elevation: 0,
       color: Theme.of(context).primaryColor.withAlpha(20),
-      //shadowColor: Theme.of(context).primaryColor.withAlpha(20),
       margin: const EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 5),
-      child: ListView(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          children: [
-            const SizedBox(height: 10,),
-            Text(
-              levelProvider.shortDescription,
-              style: Theme.of(context).textTheme.headline1,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10,),
-            _output.isNotEmpty ?
-            Text(
-              _output,
-              style: Theme.of(context).textTheme.bodyText1,
-              textAlign: TextAlign.center,
-            ) :
-            Container(),
-            _output.isNotEmpty ? const SizedBox(height: 10,) : Container(),
-          ]
-        )
+      child: MediaQuery.of(context).orientation == Orientation.portrait ?
+      Container(
+        width: double.infinity,
+        alignment: Alignment.center,
+        child: Column(
+          children: _children(context, levelProvider.shortDescription)
+        ),
+      ) :
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: _children(context, levelProvider.shortDescription),
+        ),
+      ),
     );
   }
 }
