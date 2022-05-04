@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:math_game_crossplatform/logger.dart';
-import 'json_data_models/rule_data.dart';
+import 'package:math_game_crossplatform/util/logger.dart';
+import '../json_data_models/rule_data.dart';
 
 const MethodChannel _channel = MethodChannel('mathhelper.games.crossplatform/math_util');
 
@@ -66,17 +66,19 @@ Future<NodeSelectionInfo?> getNodeByTouch(Point tap) async {
   return res;
 }
 
-void compileConfiguration(Set<Rule> rules) {
+Future<bool> compileConfiguration(Set<Rule> rules) async {
   log.info('compileConfiguration(); size == ${rules.length}');
+  bool res = false;
   try {
-    _channel.invokeMethod('compileConfiguration', <String, dynamic>{
+    await _channel.invokeMethod('compileConfiguration', <String, dynamic>{
       "rules": rules.map((e) => e.toJson()).toList()
-    }).then((v){
-      log.info('compileConfiguration finished');
     });
+    res = true;
   } on PlatformException {
     log.info('compileConfiguration failed with PlatformException');
+    res = false;
   }
+  return res;
 }
 
 Future<String> performSubstitution(int index) async {

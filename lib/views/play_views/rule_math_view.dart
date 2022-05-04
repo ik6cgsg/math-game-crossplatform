@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../math_util.dart';
+import '../../util/math_util.dart';
 
 class RuleMathView extends StatefulWidget {
   final String expression;

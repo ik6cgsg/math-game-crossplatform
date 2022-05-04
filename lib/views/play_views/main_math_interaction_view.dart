@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:math_game_crossplatform/views/main_math_view.dart';
+import 'package:math_game_crossplatform/providers/level_provider.dart';
+import 'package:math_game_crossplatform/views/play_views/main_math_view.dart';
+import 'package:provider/provider.dart';
 
-import '../math_util.dart';
+import '../../util/math_util.dart';
 
 class MathInteractionView extends StatefulWidget {
-  final String expression;
-  final void Function(Point) tapHandle;
-  final Point? ltSelected;
-  final Point? rbSelected;
-
-  const MathInteractionView(
-      this.expression, this.tapHandle, {Key? key, this.ltSelected, this.rbSelected}
-  ): super(key: key);
+  const MathInteractionView({Key? key}): super(key: key);
 
   @override
   State<MathInteractionView> createState() => _MathInteractionViewState();
@@ -44,8 +39,7 @@ class _MathInteractionViewState extends State<MathInteractionView> {
                 offset: _offset + _sessionOffset,
                 child: Transform.scale(
                   scale: _scale,
-                  child: MainMathView(widget.expression, widget.tapHandle, ltSelected: widget.ltSelected,
-                    rbSelected: widget.rbSelected),
+                  child: const MainMathView(),
               ),
             ),
           ),

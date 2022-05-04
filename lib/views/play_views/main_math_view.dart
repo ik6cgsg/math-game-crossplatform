@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../math_util.dart';
+import 'package:provider/provider.dart';
+import '../../util/math_util.dart';
+import '../../providers/level_provider.dart';
 
 class MainMathView extends StatefulWidget {
-  final String expression;
-  final void Function(Point) tapHandle;
-  final Point? ltSelected;
-  final Point? rbSelected;
-
-  const MainMathView(
-      this.expression, this.tapHandle, {Key? key, this.ltSelected, this.rbSelected}
-  ): super(key: key);
+  const MainMathView({Key? key}): super(key: key);
 
   @override
   State<MainMathView> createState() => _MainMathViewState();
@@ -23,9 +18,9 @@ class _MainMathViewState extends State<MainMathView> {
   String _curExpr = "";
   bool _loaded = false;
 
-  void _updateExpression() {
-    if (_curExpr != widget.expression) {
-      _curExpr = widget.expression;
+  void _updateExpression(String expression) {
+    if (_curExpr != expression) {
+      _curExpr = expression;
       resolveExpression(_curExpr, true, false).then((res) {
           _output = res;
           _loaded = true;
@@ -35,21 +30,20 @@ class _MainMathViewState extends State<MainMathView> {
   }
 
   Widget _loadingBody(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        //height: MediaQuery.of(context).size.width / 5,
-        child: LinearProgressIndicator(
-          color: Theme.of(context).primaryColor,
-          minHeight: 6,
-        ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      width: MediaQuery.of(context).size.width,
+      child: LinearProgressIndicator(
+        color: Theme.of(context).primaryColor,
+        minHeight: 6,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    _updateExpression();
+    final levelProvider = Provider.of<LevelProvider>(context);
+    _updateExpression(levelProvider.currentExpression);
     return !_loaded ?
     _loadingBody(context) :
     Table(
@@ -60,8 +54,8 @@ class _MainMathViewState extends State<MainMathView> {
           children: line.value.split('').asMap().entries.map((char) {
             var current = Point(char.key, line.key);
             var selected = false;
-            if (widget.ltSelected != null && widget.rbSelected != null) {
-              selected = current.isInside(widget.ltSelected!, widget.rbSelected!);
+            if (levelProvider.selectionInfo?.lt != null && levelProvider.selectionInfo?.rb != null) {
+              selected = current.isInside(levelProvider.selectionInfo!.lt, levelProvider.selectionInfo!.rb);
             }
             return TableCell(
               child: GestureDetector(
@@ -73,7 +67,7 @@ class _MainMathViewState extends State<MainMathView> {
                   Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: _width * 1.69),
                 ),
                 onTap: () {
-                  widget.tapHandle(current);
+                  levelProvider.selectNode(current);
                 },
                 onLongPress: () {
                   HapticFeedback.mediumImpact();
