@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:math_game_crossplatform/main.dart';
 import '../../util/math_util.dart';
 
 class RuleMathView extends StatefulWidget {
@@ -18,7 +19,6 @@ class RuleMathView extends StatefulWidget {
 }
 
 class _RuleMathViewState extends State<RuleMathView> {
-  static const double _borderRadius = 5;
   String _output = "";
   String _curExpr = "";
   bool _loaded = false;
@@ -52,14 +52,11 @@ class _RuleMathViewState extends State<RuleMathView> {
       return !_loaded ?
       _loadingBody(context) :
       Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(_borderRadius),
-        ),
         color: Theme.of(context).backgroundColor,
         elevation: 5,
         margin: const EdgeInsets.only(top: 3, bottom: 3),
         child: InkWell(
-          borderRadius: const BorderRadius.all(Radius.circular(_borderRadius)),
+          borderRadius: const BorderRadius.all(Radius.circular(UIConstants.borderRadius)),
           onTap: widget.onTap,
           child:  Container(
             width: constraints.maxWidth,

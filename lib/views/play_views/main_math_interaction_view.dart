@@ -3,6 +3,7 @@ import 'package:math_game_crossplatform/providers/level_provider.dart';
 import 'package:math_game_crossplatform/views/play_views/main_math_view.dart';
 import 'package:provider/provider.dart';
 
+import '../../main.dart';
 import '../../util/math_util.dart';
 
 class MathInteractionView extends StatefulWidget {
@@ -22,10 +23,7 @@ class _MathInteractionViewState extends State<MathInteractionView> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(5),
-      ),
+      color: Theme.of(context).backgroundColor,
       margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       clipBehavior: Clip.hardEdge,
       child: GestureDetector(

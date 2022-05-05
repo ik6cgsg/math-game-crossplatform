@@ -16,6 +16,10 @@ class CustomColors {
   static const Color multiselect2 = Colors.blue;
 }
 
+class UIConstants {
+  static const double borderRadius = 5;
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -54,6 +58,19 @@ class MyApp extends StatelessWidget {
               color: Colors.blueAccent,
               fontWeight: FontWeight.bold
             )
+          ),
+          cardTheme: CardTheme(
+            color: Theme.of(context).primaryColor.withAlpha(20),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            }
           )
         ),
         home: const PlayScreen(),

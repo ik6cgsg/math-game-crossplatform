@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../main.dart';
 import '../providers/game_provider.dart';
 import '../providers/level_provider.dart';
 import '../views/play_views/main_math_interaction_view.dart';
@@ -18,6 +21,7 @@ class PlayScreen extends StatefulWidget {
 }
 
 class _PlayScreenState extends State<PlayScreen> {
+
   @override
   void initState() {
     super.initState();
@@ -39,40 +43,70 @@ class _PlayScreenState extends State<PlayScreen> {
       levelProvider.load(gameProvider.taskset!.tasks[gameProvider.currentLevel], gameProvider.allRulePacks!);
     }
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-              'Уровень #${gameProvider.currentLevel}',
-              style: Theme.of(context).textTheme.headline1!.copyWith(color: Theme.of(context).backgroundColor)
+      appBar: AppBar(
+        title: Text(
+            'Уровень #${gameProvider.currentLevel}',
+            style: Theme.of(context).textTheme.headline1!.copyWith(color: Theme.of(context).backgroundColor)
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.repeat_rounded),
+            color: Theme.of(context).backgroundColor,
+            tooltip: 'Перезапуск уровня',
+            onPressed: () {
+              levelProvider.unload();
+            },
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.repeat_rounded),
-              color: Theme.of(context).backgroundColor,
+          IconButton(
+            icon: const Icon(Icons.undo_rounded),
+            color: Theme.of(context).backgroundColor,
+            tooltip: 'Отмена действия',
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('To be developed')));
+            },
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: !levelProvider.loaded ?
+          _loadingBody(context) :
+        levelProvider.passed ?
+          _passedBody(context) :
+        MediaQuery.of(context).orientation == Orientation.portrait ?
+          _portraitBody(context) :
+          _landscapeBody(context),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: !levelProvider.passed ? null : Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FloatingActionButton.extended(
+              label: const Icon(Icons.arrow_back_rounded),
+              tooltip: 'Предыдущий уровень',
+              onPressed: () {
+                // todo: prev level
+              },
+            ),
+            const SizedBox(width: 30,),
+            FloatingActionButton.extended(
+              label: const Icon(Icons.repeat_rounded),
               tooltip: 'Перезапуск уровня',
               onPressed: () {
                 levelProvider.unload();
               },
             ),
-            IconButton(
-              icon: const Icon(Icons.undo_rounded),
-              color: Theme.of(context).backgroundColor,
-              tooltip: 'Отмена действия',
+            const SizedBox(width: 30,),
+            FloatingActionButton.extended(
+              label: const Icon(Icons.arrow_forward_rounded),
+              tooltip: 'Следующий уровень',
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('To be developed')));
+                // todo: next level
               },
             ),
-          ],
-        ),
-        body: SafeArea(
-          child: levelProvider.loaded == false ?
-            _loadingBody(context) :
-          levelProvider.passed ?
-            Center(child: Text('PASSED'),) :
-          MediaQuery.of(context).orientation == Orientation.portrait ?
-            _portraitBody(context) :
-            _landscapeBody(context),
-        )
+          ]
+
+      ),
     );
   }
 
@@ -135,5 +169,58 @@ class _PlayScreenState extends State<PlayScreen> {
         ]
       );
     });
+  }
+
+  Widget _passedBody(BuildContext context) {
+    var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    var h = MediaQuery.of(context).size.height;
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: isPortrait ? h / 3 : h / 6,),
+          Text(
+            '🎉 Уровень пройден 🎉',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 25)
+          ),
+          SizedBox(height: 30,),
+          Text(
+            'Как тебе уровень?',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headline1?.copyWith(fontStyle: FontStyle.normal)
+          ),
+          SizedBox(height: 10,),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _emojiButton('😭️'),
+                _emojiButton('🙁'),
+                _emojiButton('🤨'),
+                _emojiButton('🙂'),
+                _emojiButton('😊'),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _emojiButton(String smile) {
+    return Card(
+        child: InkWell (
+          borderRadius: const BorderRadius.all(Radius.circular(UIConstants.borderRadius)),
+          onTap: (){},
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Text(smile),
+          ),
+        )
+    );
   }
 }

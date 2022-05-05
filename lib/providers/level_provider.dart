@@ -117,6 +117,9 @@ class LevelProvider with ChangeNotifier {
       var alreadyHave = _selectionInfo?.any((e) => e.nodeId == value.nodeId);
       if (alreadyHave == true) {
         _selectionInfo?.removeWhere((e) => e.nodeId == value.nodeId);
+        if (_selectionInfo?.isEmpty == true) {
+          _clearSelection();
+        }
       } else if (_multiselection) {
         _selectionInfo ??= {};
         _selectionInfo?.add(value);

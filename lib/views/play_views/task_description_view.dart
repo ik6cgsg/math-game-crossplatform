@@ -49,10 +49,6 @@ class _TaskDescriptionViewState extends State<TaskDescriptionView> {
     final levelProvider = Provider.of<LevelProvider>(context);
     _loadOutput(levelProvider);
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(5),
-      ),
-      elevation: 0,
       color: Theme.of(context).primaryColor.withAlpha(20),
       margin: const EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 5),
       child: MediaQuery.of(context).orientation == Orientation.portrait ?
