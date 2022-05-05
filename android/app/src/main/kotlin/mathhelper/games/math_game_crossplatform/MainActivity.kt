@@ -18,7 +18,6 @@ class MainActivity: FlutterActivity() {
     private val CHANNEL = "mathhelper.games.crossplatform/math_util"
     private var currentExpressionPair: MathResolverPair? = null
     private var compiledConfiguration: CompiledConfiguration? = null
-    private var ruleIndToResult: HashMap<Int, ExpressionNode>? = null
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -26,8 +25,8 @@ class MainActivity: FlutterActivity() {
             when (call.method) {
                 "resolveExpression" -> resolveExpression(call, result)
                 "getNodeByTouch" -> getNodeByTouch(call, result)
+                "getSubstitutionInfo" -> getSubstitutionInfo(call, result)
                 "compileConfiguration" -> compileConfiguration(call, result)
-                "performSubstitution" -> performSubstitution(call, result)
                 "checkEnd" -> checkEnd(call, result)
                 else -> result.notImplemented()
             }
@@ -38,7 +37,6 @@ class MainActivity: FlutterActivity() {
         val expression = call.argument<String>("expression")
         val structured = call.argument<Boolean>("structured") ?: true
         val isRule = call.argument<Boolean>("isRule") ?: false
-        //val map = hashMapOf(OperationType.DIV to "―", OperationType.MULT to "*", OperationType.MINUS to "-")
         if (expression != null) {
             val pair = MathResolver.resolveToPlain(expression, structureString = structured)
             if (!isRule) {
@@ -56,31 +54,11 @@ class MainActivity: FlutterActivity() {
         if (coords != null) {
             val nodeCoords = currentExpressionPair?.getNodeByCoords(coords[0], coords[1])
             if (nodeCoords != null) {
-                val substitutionApplication = findApplicableSubstitutionsInSelectedPlace(
-                    currentExpressionPair!!.tree!!.origin.parent!!,
-                    arrayOf(nodeCoords.node.nodeId),
-                    compiledConfiguration!!
-                )
-                /*val rules = substitutionApplication.map{ it.expressionSubstitution }.toMutableList()
-                rules = rules.distinctBy { Pair(it.left.identifier, it.right.identifier) }.toMutableList()
-                rules.sortByDescending { it.left.toString().length }
-                rules.sortBy { it.priority }
-                val leftRight = rules.map { hashMapOf(
-                    "left" to expressionToStructureString(it.left),
-                    "right" to expressionToStructureString(it.right)
-                )}*/
-                val results = arrayListOf<String>()
-                ruleIndToResult = hashMapOf()
-                for (application in substitutionApplication) {
-                    ruleIndToResult?.put(results.size, application.resultExpression)
-                    results += expressionToStructureString(application.resultExpressionChangingPart)
-                }
                 val msg = hashMapOf<String, Any?>(
                     "node" to expressionToStructureString(nodeCoords.node),
+                    "id" to nodeCoords.node.nodeId,
                     "lt" to listOf(nodeCoords.lt.x, nodeCoords.lt.y),
                     "rb" to listOf(nodeCoords.rb.x, nodeCoords.rb.y),
-                    //"rules" to leftRight,
-                    "results" to results,
                 )
                 res.success(msg)
             } else {
@@ -89,6 +67,39 @@ class MainActivity: FlutterActivity() {
             }
         } else {
             res.error("getNodeByTouch", "Bad arguments: ${call.argument<Any>("coords")}", null)
+        }
+    }
+
+    private fun getSubstitutionInfo(call: MethodCall, res: MethodChannel.Result) {
+        println("ANDROID getSubstitutionInfo")
+        val ids = call.argument<List<Int>>("ids")
+        if (ids != null) {
+            val substitutionApplication = findApplicableSubstitutionsInSelectedPlace(
+                currentExpressionPair!!.tree!!.origin.parent!!,
+                ids.toTypedArray(),
+                compiledConfiguration!!
+            )
+            /*val rules = substitutionApplication.map{ it.expressionSubstitution }.toMutableList()
+            rules = rules.distinctBy { Pair(it.left.identifier, it.right.identifier) }.toMutableList()
+            rules.sortByDescending { it.left.toString().length }
+            rules.sortBy { it.priority }
+            val leftRight = rules.map { hashMapOf(
+                "left" to expressionToStructureString(it.left),
+                "right" to expressionToStructureString(it.right)
+            )}*/
+            val rules = arrayListOf<String>()
+            val results = arrayListOf<String>()
+            for (application in substitutionApplication) {
+                rules += expressionToStructureString(application.resultExpressionChangingPart)
+                results += expressionToStructureString(application.resultExpression)
+            }
+            val msg = hashMapOf<String, Any?>(
+                "rules" to rules,
+                "results" to results,
+            )
+            res.success(msg)
+        } else {
+            res.error("getSubstitutionInfo", "Bad arguments: ${call.argument<Any>("ids")}", null)
         }
     }
 
@@ -114,17 +125,6 @@ class MainActivity: FlutterActivity() {
         compiledConfiguration = createCompiledConfigurationFromExpressionSubstitutionsAndParams(
             subs.toTypedArray())
         res.success(null)
-    }
-    
-    private fun performSubstitution(call: MethodCall, res: MethodChannel.Result) {
-        val i = call.argument<Int>("index")
-        val resExpr = ruleIndToResult?.get(i)
-        if (resExpr != null) {
-            ruleIndToResult = null
-            res.success(expressionToStructureString(resExpr))
-        } else {
-            res.error("performSubstitution", "Bad arguments: ${call.arguments}", null)
-        }
     }
 
     private fun checkEnd(call: MethodCall, res: MethodChannel.Result) {

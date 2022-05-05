@@ -45,7 +45,7 @@ class _MathInteractionViewState extends State<MathInteractionView> {
           ),
         ),
         onTap: () {
-          //todo: unselect all
+          Provider.of<LevelProvider>(context, listen: false).clearSelection();
         },
         onScaleStart: (details) {
           _initialFocalPoint = details.focalPoint;

@@ -11,6 +11,11 @@ void main() {
   runApp(const MyApp());
 }
 
+class CustomColors {
+  static const Color multiselect1 = Colors.yellow;
+  static const Color multiselect2 = Colors.blue;
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -29,6 +34,7 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         theme: ThemeData(
           primarySwatch: Colors.teal,
+          backgroundColor: Colors.white,
           textTheme: TextTheme(
             // todo: download font to assets
             bodyText1: GoogleFonts.notoSansMono(

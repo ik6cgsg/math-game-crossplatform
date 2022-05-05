@@ -7,7 +7,6 @@ import MathResolverLib
     let CHANNEL = "mathhelper.games.crossplatform/math_util"
     var currentExpressionPair: MathResolverPair?
     var compiledConfiguration: CompiledConfiguration?
-    var ruleIndToResult: [Int: ExpressionNode]?
     
     override func application(
         _ application: UIApplication,
@@ -19,8 +18,8 @@ import MathResolverLib
             switch call.method {
             case "resolveExpression": self.resolveExpression(call, result)
             case "getNodeByTouch": self.getNodeByTouch(call, result)
+            case "getSubstitutionInfo": self.getSubstitutionInfo(call, result)
             case "compileConfiguration": self.compileConfiguration(call, result)
-            case "performSubstitution": self.performSubstitution(call, result)
             case "checkEnd": self.checkEnd(call, result)
             default: result(FlutterMethodNotImplemented)
             }
@@ -44,7 +43,7 @@ import MathResolverLib
             let matrix = pair.matrix as NSArray as! [String]
             result(matrix.joined(separator: "\n"))
         } else {
-            result(FlutterError(code: "resolveExpression", message: "Bad arguments: \(call.arguments as? [String: Any])", details: nil))
+            result(FlutterError(code: "resolveExpression", message: "Bad arguments: \(args)", details: nil))
         }
     }
     
@@ -52,8 +51,23 @@ import MathResolverLib
         let args = call.arguments as? [String: Any]
         let coords = args?["coords"] as? [Int32]
         if let coords = coords, let nodeCoords = self.currentExpressionPair?.getNodeByCoords(x: coords[0], y: coords[1]) {
-            let nodes = KotlinArray<KotlinInt>(size: 1, init: { _ in
-                return KotlinInt(value: nodeCoords.node.nodeId)
+            let msg: [String: Any] = [
+                "node": ExpressionParserAPIKt.expressionToStructureString(expressionNode: nodeCoords.node),
+                "id": nodeCoords.node.nodeId,
+                "lt": [nodeCoords.lt.x, nodeCoords.lt.y],
+                "rb": [nodeCoords.rb.x, nodeCoords.rb.y]
+            ]
+            result(msg)
+        } else {
+            result(FlutterError(code: "getNodeByTouch", message: "Node not found for x: \(coords?[0]), y: \(coords?[1])", details: nil))
+        }
+    }
+    
+    private func getSubstitutionInfo(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let args = call.arguments as? [String: Any]
+        if let ids = args?["ids"] as? [Int32] {
+            let nodes = KotlinArray<KotlinInt>(size: Int32(ids.count), init: { i in
+                return KotlinInt(value: ids[i.intValue])
             })
             let substitutionApplication = ExpressionSubstitutionsAPIKt.findApplicableSubstitutionsInSelectedPlace(
                 expression: currentExpressionPair!.tree!.origin.parent!,
@@ -63,23 +77,23 @@ import MathResolverLib
                 withReadyApplicationResult: true,
                 withFullExpressionChangingPart: true
             )
+            var rules = [String]()
             var results = [String]()
-            ruleIndToResult = [:]
             for application in substitutionApplication {
-                ruleIndToResult?[results.count] = application.resultExpression
-                results.append(
+                rules.append(
                     ExpressionParserAPIKt.expressionToStructureString(expressionNode: application.resultExpressionChangingPart)
+                )
+                results.append(
+                    ExpressionParserAPIKt.expressionToStructureString(expressionNode: application.resultExpression)
                 )
             }
             let msg: [String: Any] = [
-                "node": ExpressionParserAPIKt.expressionToStructureString(expressionNode: nodeCoords.node),
-                "lt": [nodeCoords.lt.x, nodeCoords.lt.y],
-                "rb": [nodeCoords.rb.x, nodeCoords.rb.y],
+                "rules": rules,
                 "results": results
             ]
             result(msg)
         } else {
-            result(FlutterError(code: "getNodeByTouch", message: "Node not found for x: \(coords?[0]), y: \(coords?[1])", details: nil))
+            result(FlutterError(code: "getSubstitutionInfo", message: "Bad arguments: \(args)", details: nil))
         }
     }
     
@@ -117,19 +131,6 @@ import MathResolverLib
         result(nil)
     }
     
-    private func performSubstitution(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
-        let args = call.arguments as? [String: Int]
-        if let i = args?["index"], let resExpr = ruleIndToResult?[i] {
-            //§
-            //val pair = MathResolver.resolveToPlain(resExpr, customSymbolMap = map)
-            //currentExpressionPair = pair
-            ruleIndToResult = nil
-            result(ExpressionParserAPIKt.expressionToStructureString(expressionNode: resExpr))
-        } else {
-            result(FlutterError(code: "performSubstitution", message: "Bad arguments: ${call.arguments}", details: nil))
-        }
-    }
-    
     private func checkEnd(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let args = call.arguments as? [String: String]
         if let expression = args?["expression"], let goal = args?["goal"], let pattern = args?["pattern"] {
@@ -143,7 +144,7 @@ import MathResolverLib
                 result(ExpressionComparisonsAPIKt.compareByPattern(expression: ex, pattern: pat))
             }
         } else {
-            result(FlutterError(code: "checkEnd", message: "Bad arguments: ${call.arguments}", details: nil))
+            result(FlutterError(code: "checkEnd", message: "Bad arguments: \(args)", details: nil))
         }
     }
 }

@@ -41,24 +41,25 @@ class _PlayScreenState extends State<PlayScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-              levelProvider.name,
-              style: Theme.of(context).textTheme.bodyText1
+              'Уровень #${gameProvider.currentLevel}',
+              style: Theme.of(context).textTheme.headline1!.copyWith(color: Theme.of(context).backgroundColor)
           ),
           actions: [
             IconButton(
               icon: const Icon(Icons.repeat_rounded),
-              tooltip: 'Restart level',
+              color: Theme.of(context).backgroundColor,
+              tooltip: 'Перезапуск уровня',
               onPressed: () {
                 levelProvider.unload();
-                //Navigator.pushReplacementNamed(context, PlayScreen.routeName);
               },
             ),
             IconButton(
               icon: const Icon(Icons.undo_rounded),
-              tooltip: 'Undo',
+              color: Theme.of(context).backgroundColor,
+              tooltip: 'Отмена действия',
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Undo')));
+                    const SnackBar(content: Text('To be developed')));
               },
             ),
           ],

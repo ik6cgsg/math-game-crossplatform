@@ -55,7 +55,7 @@ class _RuleMathViewState extends State<RuleMathView> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_borderRadius),
         ),
-        color: Colors.grey.shade100,
+        color: Theme.of(context).backgroundColor,
         elevation: 5,
         margin: const EdgeInsets.only(top: 3, bottom: 3),
         child: InkWell(

@@ -20,12 +20,12 @@ class RulesListView extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(5.0),
         alignment: Alignment.center,
-        child: levelProvider.selectionInfo == null ?
+        child: levelProvider.substitutionRules == null ?
           const NoRulesView() :
           SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: levelProvider.selectionInfo!.results.asMap().entries.map((pair) {
+              children: levelProvider.substitutionRules!.asMap().entries.map((pair) {
                 return RuleMathView(pair.value, () => levelProvider.selectRule(pair.key),);
               }).toList(),
             ),

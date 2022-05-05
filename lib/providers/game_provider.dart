@@ -10,7 +10,7 @@ class GameProvider with ChangeNotifier {
   List<RulePackage>? _allRulePacks;
   bool _loaded = false;
   bool _loadStarted = false;
-  int _currentLevel = 0;
+  int _currentLevel = 2;
 
   bool get loaded {
     return _loaded;

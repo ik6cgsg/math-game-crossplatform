@@ -383,7 +383,7 @@
 					"-framework",
 					MathResolverLib,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = test.mathhelper.games.mathGameCrossplatform;
+				PRODUCT_BUNDLE_IDENTIFIER = mathhelper.games.mathGameCrossplatform;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -527,7 +527,7 @@
 					"-framework",
 					MathResolverLib,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = test.mathhelper.games.mathGameCrossplatform;
+				PRODUCT_BUNDLE_IDENTIFIER = mathhelper.games.mathGameCrossplatform;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -565,7 +565,7 @@
 					"-framework",
 					MathResolverLib,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = test.mathhelper.games.mathGameCrossplatform;
+				PRODUCT_BUNDLE_IDENTIFIER = mathhelper.games.mathGameCrossplatform;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:math_game_crossplatform/main.dart';
 import 'package:provider/provider.dart';
 import '../../util/math_util.dart';
 import '../../providers/level_provider.dart';
@@ -40,6 +41,27 @@ class _MainMathViewState extends State<MainMathView> {
     );
   }
 
+  Color? _getSelectionColor(BuildContext context, LevelProvider provider, Point cur) {
+    int selectedTimes = 0;
+    provider.selectedNodes?.forEach((box) {
+      if (cur.isInside(box)) {
+        selectedTimes++;
+      }
+    });
+    if (selectedTimes > 0) {
+      if (!provider.multiselectionModeOn) {
+        return Theme.of(context).primaryColor;
+      }
+      if (selectedTimes % 2 == 0) {
+        return CustomColors.multiselect2;
+      }
+      if (selectedTimes % 2 == 1) {
+        return CustomColors.multiselect1;
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final levelProvider = Provider.of<LevelProvider>(context);
@@ -53,24 +75,38 @@ class _MainMathViewState extends State<MainMathView> {
         return TableRow(
           children: line.value.split('').asMap().entries.map((char) {
             var current = Point(char.key, line.key);
-            var selected = false;
-            if (levelProvider.selectionInfo?.lt != null && levelProvider.selectionInfo?.rb != null) {
-              selected = current.isInside(levelProvider.selectionInfo!.lt, levelProvider.selectionInfo!.rb);
-            }
+            var selectionColor = _getSelectionColor(context, levelProvider, current);
             return TableCell(
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 child: Text(
                   char.value,
-                  style: selected ?
-                  Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: _width * 1.69) :
-                  Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: _width * 1.69),
+                  style: selectionColor != null ?
+                    Theme.of(context).textTheme.bodyText2!.copyWith(
+                        fontSize: _width * 1.69,
+                        color: selectionColor,
+                    ) :
+                    Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: _width * 1.69),
                 ),
                 onTap: () {
                   levelProvider.selectNode(current);
                 },
                 onLongPress: () {
                   HapticFeedback.mediumImpact();
+                  levelProvider.toggleMultiselection(current);
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: levelProvider.multiselectionModeOn ?
+                      const Text('Режим мультивыбора включен') :
+                      const Text('Режим мультивыбора отключен'),
+                    action: SnackBarAction(
+                      label: 'Отменить',
+                      onPressed: () {
+                        levelProvider.toggleMultiselection(current);
+                      },
+                    ),
+                    duration: const Duration(seconds: 4),
+                  ));
                 },
               ),
             );
