@@ -31,8 +31,8 @@ class _NoRulesViewState extends State<NoRulesView> with TickerProviderStateMixin
       child: FadeTransition(
           opacity: Tween<double>(begin: 1, end: 0.1).animate(_controller),
           child: Text(
-            "No rules,\nchoose\nexpression's\nnode",
-            textAlign: TextAlign.center,
+            "Нет правил.\nВыбери узел\nв выражении!",
+            textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.headline1,
           )
       ),

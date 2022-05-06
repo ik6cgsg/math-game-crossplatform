@@ -39,21 +39,23 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.teal,
           backgroundColor: Colors.white,
-          textTheme: TextTheme(
-            // todo: download font to assets
-            bodyText1: GoogleFonts.notoSansMono(
+          textTheme: const TextTheme(
+            bodyText1: TextStyle(
+              fontFamily: 'NotoSansMono',
               fontSize: 13,
               height: 0.69,
               color: Colors.black,
               fontWeight: FontWeight.normal,
             ),
-            bodyText2: GoogleFonts.notoSansMono(
+            bodyText2: TextStyle(
+              fontFamily: 'NotoSansMono',
               fontSize: 13,
               height: 0.69,
               color: Colors.teal,
               fontWeight: FontWeight.bold,
             ),
-            headline1: GoogleFonts.notoSansMono(
+            headline1: TextStyle(
+              fontFamily: 'NotoSansMono',
               fontSize: 15,
               color: Colors.blueAccent,
               fontWeight: FontWeight.bold
