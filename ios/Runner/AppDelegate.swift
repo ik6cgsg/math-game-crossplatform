@@ -15,39 +15,47 @@ import MathResolverLib
         let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: CHANNEL, binaryMessenger: controller.binaryMessenger)
         channel.setMethodCallHandler({(call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-            switch call.method {
-            case "resolveExpression": self.resolveExpression(call, result)
-            case "getNodeByTouch": self.getNodeByTouch(call, result)
-            case "getSubstitutionInfo": self.getSubstitutionInfo(call, result)
-            case "compileConfiguration": self.compileConfiguration(call, result)
-            case "checkEnd": self.checkEnd(call, result)
-            default: result(FlutterMethodNotImplemented)
+            do {
+                switch call.method {
+                case "resolveExpression": try self.resolveExpression(call, result)
+                case "getNodeByTouch": try self.getNodeByTouch(call, result)
+                case "getSubstitutionInfo": try self.getSubstitutionInfo(call, result)
+                case "compileConfiguration": try self.compileConfiguration(call, result)
+                case "checkEnd": try self.checkEnd(call, result)
+                default: result(FlutterMethodNotImplemented)
+                }
+            } catch {
+                result(FlutterError(code: "MethodCallHandler", message: "Fatal error: \(error)", details: nil))
             }
         })
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
-    private func resolveExpression(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+    private func resolveExpression(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) throws {
         let args = call.arguments as? [String: Any]
         let expression = args?["expression"] as? String
         let structured = args?["structured"] as? Bool
-        let isRule = args?["isRule"] as? Bool ?? false
+        let interactive = args?["interactive"] as? Bool ?? false
         if let ex = expression, let st = structured {
             let map = KotlinMutableDictionary<OperationType, NSString>(dictionary: [OperationType.div: "—"])
             let pair = MathResolver.companion.resolveToPlain(expression: ex, style: .default_,
                 taskType: .default_, structureString: st, customSymbolMap: map)
-            if (!isRule) {
+            if (interactive) {
                 self.currentExpressionPair = pair
             }
-            let matrix = pair.matrix as NSArray as! [String]
-            result(matrix.joined(separator: "\n"))
+            if (pair.tree != nil) {
+                let matrix = pair.matrix as NSArray as! [String]
+                result(matrix.joined(separator: "\n"))
+            } else {
+                result(FlutterError(code: "resolveExpression", message: "Failed to resolve \(expression)", details: nil))
+            }
         } else {
             result(FlutterError(code: "resolveExpression", message: "Bad arguments: \(args)", details: nil))
         }
     }
     
-    private func getNodeByTouch(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+    private func getNodeByTouch(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) throws {
         let args = call.arguments as? [String: Any]
         let coords = args?["coords"] as? [Int32]
         if let coords = coords, let nodeCoords = self.currentExpressionPair?.getNodeByCoords(x: coords[0], y: coords[1]) {
@@ -63,7 +71,7 @@ import MathResolverLib
         }
     }
     
-    private func getSubstitutionInfo(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+    private func getSubstitutionInfo(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) throws {
         let args = call.arguments as? [String: Any]
         if let ids = args?["ids"] as? [Int32] {
             let nodes = KotlinArray<KotlinInt>(size: Int32(ids.count), init: { i in
@@ -97,7 +105,7 @@ import MathResolverLib
         }
     }
     
-    private func compileConfiguration(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+    private func compileConfiguration(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) throws {
         let args = call.arguments as? [String: Any]
         let rules = args?["rules"] as? [[String: Any]]
         var subs = [ExpressionSubstitution]()
@@ -113,7 +121,7 @@ import MathResolverLib
                 code: rule["code"] as? String ?? "",
                 nameEn: rule["nameEn"] as? String ?? "",
                 nameRu: rule["nameRu"] as? String ?? "",
-                normalizationType: ExpressionSubstitutionNormType
+                normalizationType: try ExpressionSubstitutionNormType
                     .value(forKey: (rule["normalizationType"] as? String ?? "ORIGINAL").lowercased()) as! ExpressionSubstitutionNormType,
                 weight: rule["weight"] as? Double ?? 0,
                 weightInTaskAutoGeneration: rule["weightInTaskAutoGeneration"] as? Double ?? 0,
@@ -131,7 +139,7 @@ import MathResolverLib
         result(nil)
     }
     
-    private func checkEnd(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
+    private func checkEnd(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) throws {
         let args = call.arguments as? [String: String]
         if let expression = args?["expression"], let goal = args?["goal"], let pattern = args?["pattern"] {
             if pattern.isEmpty {

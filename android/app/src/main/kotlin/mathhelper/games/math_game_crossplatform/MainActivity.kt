@@ -36,20 +36,23 @@ class MainActivity: FlutterActivity() {
     private fun resolveExpression(call: MethodCall, res: MethodChannel.Result) {
         val expression = call.argument<String>("expression")
         val structured = call.argument<Boolean>("structured") ?: true
-        val isRule = call.argument<Boolean>("isRule") ?: false
+        val interactive = call.argument<Boolean>("interactive") ?: false
         if (expression != null) {
             val pair = MathResolver.resolveToPlain(expression, structureString = structured)
-            if (!isRule) {
+            if (interactive) {
                 currentExpressionPair = pair
             }
-            res.success(pair.matrix.joinToString("\n"))
+            if (pair.tree != null) {
+                res.success(pair.matrix.joinToString("\n"))
+            } else {
+                res.error("resolveExpression", "Failed to resolve $expression", null)
+            }
         } else {
             res.error("resolveExpression", "Bad arguments: ${call.arguments}", null)
         }
     }
 
     private fun getNodeByTouch(call: MethodCall, res: MethodChannel.Result) {
-        println("ANDROID getNodeByTouch")
         val coords = call.argument<List<Int>>("coords")
         if (coords != null) {
             val nodeCoords = currentExpressionPair?.getNodeByCoords(coords[0], coords[1])
@@ -71,7 +74,6 @@ class MainActivity: FlutterActivity() {
     }
 
     private fun getSubstitutionInfo(call: MethodCall, res: MethodChannel.Result) {
-        println("ANDROID getSubstitutionInfo")
         val ids = call.argument<List<Int>>("ids")
         if (ids != null) {
             val substitutionApplication = findApplicableSubstitutionsInSelectedPlace(

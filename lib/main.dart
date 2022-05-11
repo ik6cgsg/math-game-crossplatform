@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:math_game_crossplatform/util/logger.dart';
-import 'package:math_game_crossplatform/providers/level_provider.dart';
-import 'package:math_game_crossplatform/screens/play_screen.dart';
-import 'package:provider/provider.dart';
-import 'providers/game_provider.dart';
+import 'package:math_game_crossplatform/di.dart' as di;
+import 'package:math_game_crossplatform/presentation/screens/play_screen.dart';
 
-void main() {
+import 'core/logger.dart';
+import 'presentation/screens/game_screen.dart';
+
+void main() async {
+  await di.init();
   initLogger();
   runApp(const MyApp());
 }
@@ -25,41 +25,39 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(
-          value: GameProvider(),
-        ),
-        ChangeNotifierProvider.value(
-          value: LevelProvider(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
           primarySwatch: Colors.teal,
           backgroundColor: Colors.white,
           textTheme: const TextTheme(
-            bodyText1: TextStyle(
-              fontFamily: 'NotoSansMono',
-              fontSize: 13,
-              height: 0.69,
-              color: Colors.black,
-              fontWeight: FontWeight.normal,
-            ),
-            bodyText2: TextStyle(
-              fontFamily: 'NotoSansMono',
-              fontSize: 13,
-              height: 0.69,
-              color: Colors.teal,
-              fontWeight: FontWeight.bold,
-            ),
-            headline1: TextStyle(
-              fontFamily: 'NotoSansMono',
-              fontSize: 15,
-              color: Colors.blueAccent,
-              fontWeight: FontWeight.bold
-            )
+              bodyText1: TextStyle(
+                fontFamily: 'NotoSansMono',
+                fontSize: 13,
+                height: 0.69,
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
+              bodyText2: TextStyle(
+                fontFamily: 'NotoSansMono',
+                fontSize: 13,
+                height: 0.69,
+                color: Colors.teal,
+                fontWeight: FontWeight.bold,
+              ),
+              headline2: TextStyle(
+                fontFamily: 'NotoSansMono',
+                fontSize: 15,
+                height: 1,
+                color: Colors.red,
+                fontWeight: FontWeight.normal,
+              ),
+              headline1: TextStyle(
+                  fontFamily: 'NotoSansMono',
+                  fontSize: 15,
+                  color: Colors.blueAccent,
+                  fontWeight: FontWeight.bold
+              )
           ),
           cardTheme: CardTheme(
             color: Theme.of(context).primaryColor.withAlpha(20),
@@ -69,18 +67,16 @@ class MyApp extends StatelessWidget {
             ),
           ),
           pageTransitionsTheme: const PageTransitionsTheme(
-            builders: {
-              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-            }
+              builders: {
+                TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+              }
           )
-        ),
-        home: const PlayScreen(),
-        routes: {
-          PlayScreen.routeName: (ctx) => const PlayScreen()
-          // todo: HomeScreen
-        },
-      )
+      ),
+      home: const GameScreen(),
+      routes: {
+        PlayScreen.routeName: (ctx) => PlayScreen()
+      },
     );
   }
 }
