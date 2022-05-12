@@ -115,13 +115,17 @@ class _MainMathViewState extends State<MainMathView> {
     if (selectedTimes > 0) {
       if (!playState.multiselectMode) {
         return Theme.of(context).primaryColor;
+      } else {
+        final hsl = HSLColor.fromColor(CustomColors.multiselect1);
+        final hslDark = hsl.withLightness((hsl.lightness - 0.1 * selectedTimes).clamp(0.0, 1.0));
+        return hslDark.toColor();
       }
-      if (selectedTimes % 2 == 0) {
+      /*if (selectedTimes % 2 == 0) {
         return CustomColors.multiselect2;
       }
       if (selectedTimes % 2 == 1) {
         return CustomColors.multiselect1;
-      }
+      }*/
     }
     return null;
   }

@@ -15,24 +15,20 @@ import MathResolverLib
         let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: CHANNEL, binaryMessenger: controller.binaryMessenger)
         channel.setMethodCallHandler({(call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-            do {
-                switch call.method {
-                case "resolveExpression": try self.resolveExpression(call, result)
-                case "getNodeByTouch": try self.getNodeByTouch(call, result)
-                case "getSubstitutionInfo": try self.getSubstitutionInfo(call, result)
-                case "compileConfiguration": try self.compileConfiguration(call, result)
-                case "checkEnd": try self.checkEnd(call, result)
-                default: result(FlutterMethodNotImplemented)
-                }
-            } catch {
-                result(FlutterError(code: "MethodCallHandler", message: "Fatal error: \(error)", details: nil))
+            switch call.method {
+            case "resolveExpression": self.resolveExpression(call, result)
+            case "getNodeByTouch": self.getNodeByTouch(call, result)
+            case "getSubstitutionInfo": self.getSubstitutionInfo(call, result)
+            case "compileConfiguration": self.compileConfiguration(call, result)
+            case "checkEnd": self.checkEnd(call, result)
+            default: result(FlutterMethodNotImplemented)
             }
         })
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
-    private func resolveExpression(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) throws {
+    private func resolveExpression(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let args = call.arguments as? [String: Any]
         let expression = args?["expression"] as? String
         let structured = args?["structured"] as? Bool
@@ -55,7 +51,7 @@ import MathResolverLib
         }
     }
     
-    private func getNodeByTouch(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) throws {
+    private func getNodeByTouch(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let args = call.arguments as? [String: Any]
         let coords = args?["coords"] as? [Int32]
         if let coords = coords, let nodeCoords = self.currentExpressionPair?.getNodeByCoords(x: coords[0], y: coords[1]) {
@@ -71,7 +67,7 @@ import MathResolverLib
         }
     }
     
-    private func getSubstitutionInfo(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) throws {
+    private func getSubstitutionInfo(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let args = call.arguments as? [String: Any]
         if let ids = args?["ids"] as? [Int32] {
             let nodes = KotlinArray<KotlinInt>(size: Int32(ids.count), init: { i in
@@ -105,11 +101,22 @@ import MathResolverLib
         }
     }
     
-    private func compileConfiguration(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) throws {
+    private func compileConfiguration(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let args = call.arguments as? [String: Any]
         let rules = args?["rules"] as? [[String: Any]]
         var subs = [ExpressionSubstitution]()
         for rule in rules ?? [] {
+            var normType = ExpressionSubstitutionNormType.original
+            switch (rule["normalizationType"] as? String)?.lowercased() {
+            case "sortedAndIMultiplicated":
+                normType = ExpressionSubstitutionNormType.sortedAndIMultiplicated
+            case "iMultiplicated":
+                normType = ExpressionSubstitutionNormType.iMultiplicated
+            case "sorted":
+                normType = ExpressionSubstitutionNormType.sorted
+            default:
+                normType = ExpressionSubstitutionNormType.original
+            }
             let substitution = ExpressionSubstitutionsAPIKt.expressionSubstitutionFromStructureStrings(
                 leftStructureString: rule["leftStructureString"] as? String ?? "",
                 rightStructureString: rule["rightStructureString"] as? String ?? "",
@@ -121,8 +128,7 @@ import MathResolverLib
                 code: rule["code"] as? String ?? "",
                 nameEn: rule["nameEn"] as? String ?? "",
                 nameRu: rule["nameRu"] as? String ?? "",
-                normalizationType: try ExpressionSubstitutionNormType
-                    .value(forKey: (rule["normalizationType"] as? String ?? "ORIGINAL").lowercased()) as! ExpressionSubstitutionNormType,
+                normalizationType: normType,
                 weight: rule["weight"] as? Double ?? 0,
                 weightInTaskAutoGeneration: rule["weightInTaskAutoGeneration"] as? Double ?? 0,
                 useWhenPostprocessGeneratedExpression: rule["weightInTaskAutoGeneration"] as? Bool ?? false
@@ -139,7 +145,7 @@ import MathResolverLib
         result(nil)
     }
     
-    private func checkEnd(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) throws {
+    private func checkEnd(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let args = call.arguments as? [String: String]
         if let expression = args?["expression"], let goal = args?["goal"], let pattern = args?["pattern"] {
             if pattern.isEmpty {

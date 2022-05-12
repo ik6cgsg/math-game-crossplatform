@@ -42,7 +42,7 @@ class _PlayScreenState extends State<PlayScreen> {
       child: BlocBuilder<PlayBloc, PlayState>(builder: (context, state) {
         log.info('PlayScreen::build: $state');
         return Scaffold(
-          appBar: _appBar(context, index),
+          appBar: _appBar(context),
           body: SafeArea(
             child: state is Loading ?
               _loadingBody(context) :
@@ -61,7 +61,12 @@ class _PlayScreenState extends State<PlayScreen> {
     );
   }
 
-  PreferredSizeWidget _appBar(BuildContext context, int index) {
+  PreferredSizeWidget _appBar(BuildContext context) {
+    var index = '';
+    final playBloc = BlocProvider.of<PlayBloc>(context, listen: true);
+    if (playBloc.state is !Loading) {
+      index = playBloc.levelIndex.toString();
+    }
     return AppBar(
       title: Text(
           'Уровень #$index',
@@ -73,8 +78,8 @@ class _PlayScreenState extends State<PlayScreen> {
           icon: const Icon(Icons.repeat_rounded),
           color: Theme.of(context).backgroundColor,
           tooltip: 'Перезапуск уровня',
-          onPressed: () {
-            BlocProvider.of<PlayBloc>(context).add(LoadTaskEvent(index));
+          onPressed: int.tryParse(index) == null ? null : () {
+            BlocProvider.of<PlayBloc>(context).add(LoadTaskEvent(int.parse(index)));
           },
         ),
         IconButton(
@@ -159,9 +164,9 @@ class _PlayScreenState extends State<PlayScreen> {
           FloatingActionButton.extended(
             label: const Icon(Icons.arrow_back_rounded),
             tooltip: 'Предыдущий уровень',
+            backgroundColor: !info.hasPrev ? Colors.grey : Theme.of(context).primaryColor,
             onPressed: !info.hasPrev ? null : () {
-              Navigator.of(context)
-                .pushReplacementNamed(PlayScreen.routeName, arguments: bloc.levelIndex - 1);
+              bloc.add(LoadTaskEvent(bloc.levelIndex - 1));
             },
           ),
           const SizedBox(width: 30,),
@@ -176,9 +181,9 @@ class _PlayScreenState extends State<PlayScreen> {
           FloatingActionButton.extended(
             label: const Icon(Icons.arrow_forward_rounded),
             tooltip: 'Следующий уровень',
+            backgroundColor: !info.hasNext ? Colors.grey : Theme.of(context).primaryColor,
             onPressed: !info.hasNext ? null : () {
-              Navigator.of(context)
-                  .pushReplacementNamed(PlayScreen.routeName, arguments: bloc.levelIndex + 1);
+              bloc.add(LoadTaskEvent(bloc.levelIndex + 1));
             },
           ),
         ]

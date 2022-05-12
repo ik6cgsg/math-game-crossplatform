@@ -9,11 +9,9 @@ class LevelView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
+    return InkWell(
         child: GridTile(
           header: GridTileBar(
-            backgroundColor: Colors.white.withOpacity(0.5),
             title: Text(
               'Уровень #$index',
               textAlign: TextAlign.center,
@@ -25,7 +23,7 @@ class LevelView extends StatelessWidget {
             ),
           ),
           child: Opacity(
-            opacity: 0.5,
+            opacity: 0.2,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: Image.asset('assets/images/back.jpeg',
@@ -34,16 +32,16 @@ class LevelView extends StatelessWidget {
             ),
           ),
           footer: GridTileBar(
-            backgroundColor: Colors.white.withOpacity(0.5),
             leading: Icon(
               Icons.play_arrow_rounded,
               color: Theme.of(context).primaryColor,
+              size: 30,
             ),
           ),
         ),
         borderRadius: BorderRadius.circular(5),
         onTap: onTap,
-      ),
+      //),
     );
   }
 }
