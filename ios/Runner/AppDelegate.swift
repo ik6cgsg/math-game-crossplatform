@@ -108,9 +108,9 @@ import MathResolverLib
         for rule in rules ?? [] {
             var normType = ExpressionSubstitutionNormType.original
             switch (rule["normalizationType"] as? String)?.lowercased() {
-            case "sortedAndIMultiplicated":
+            case "sorted_and_i_multiplicated":
                 normType = ExpressionSubstitutionNormType.sortedAndIMultiplicated
-            case "iMultiplicated":
+            case "i_multiplicated":
                 normType = ExpressionSubstitutionNormType.iMultiplicated
             case "sorted":
                 normType = ExpressionSubstitutionNormType.sorted

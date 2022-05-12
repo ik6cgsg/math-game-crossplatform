@@ -109,6 +109,12 @@ class MainActivity: FlutterActivity() {
         val rules = call.argument<List<Map<String, *>>>("rules")
         val subs = arrayListOf<ExpressionSubstitution>()
         for (rule in rules ?: listOf()) {
+            val normType = when (rule["normalizationType"] as String) {
+                "SORTED_AND_I_MULTIPLICATED" -> ExpressionSubstitutionNormType.SORTED_AND_I_MULTIPLICATED
+                "I_MULTIPLICATED" -> ExpressionSubstitutionNormType.I_MULTIPLICATED
+                "SORTED" -> ExpressionSubstitutionNormType.SORTED
+                else -> ExpressionSubstitutionNormType.ORIGINAL
+            }
             val substitution = expressionSubstitutionFromStructureStrings(
                 leftStructureString = rule["leftStructureString"] as String,
                 rightStructureString = rule["rightStructureString"] as String,
@@ -120,7 +126,7 @@ class MainActivity: FlutterActivity() {
                 code = rule["code"] as String,
                 nameEn = rule["nameEn"] as String,
                 nameRu = rule["nameRu"] as String,
-                normalizationType = ExpressionSubstitutionNormType.valueOf(rule["normalizationType"] as String)
+                normalizationType = normType
             )
             subs.add(substitution)
         }
