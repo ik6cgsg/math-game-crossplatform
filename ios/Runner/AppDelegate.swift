@@ -32,16 +32,20 @@ import MathResolverLib
         let args = call.arguments as? [String: Any]
         let expression = args?["expression"] as? String
         let structured = args?["structured"] as? Bool
-        let isRule = args?["isRule"] as? Bool ?? false
+        let interactive = args?["interactive"] as? Bool ?? false
         if let ex = expression, let st = structured {
             let map = KotlinMutableDictionary<OperationType, NSString>(dictionary: [OperationType.div: "—"])
             let pair = MathResolver.companion.resolveToPlain(expression: ex, style: .default_,
                 taskType: .default_, structureString: st, customSymbolMap: map)
-            if (!isRule) {
+            if (interactive) {
                 self.currentExpressionPair = pair
             }
-            let matrix = pair.matrix as NSArray as! [String]
-            result(matrix.joined(separator: "\n"))
+            if (pair.tree != nil) {
+                let matrix = pair.matrix as NSArray as! [String]
+                result(matrix.joined(separator: "\n"))
+            } else {
+                result(FlutterError(code: "resolveExpression", message: "Failed to resolve \(expression)", details: nil))
+            }
         } else {
             result(FlutterError(code: "resolveExpression", message: "Bad arguments: \(args)", details: nil))
         }
@@ -102,6 +106,17 @@ import MathResolverLib
         let rules = args?["rules"] as? [[String: Any]]
         var subs = [ExpressionSubstitution]()
         for rule in rules ?? [] {
+            var normType = ExpressionSubstitutionNormType.original
+            switch (rule["normalizationType"] as? String)?.lowercased() {
+            case "sorted_and_i_multiplicated":
+                normType = ExpressionSubstitutionNormType.sortedAndIMultiplicated
+            case "i_multiplicated":
+                normType = ExpressionSubstitutionNormType.iMultiplicated
+            case "sorted":
+                normType = ExpressionSubstitutionNormType.sorted
+            default:
+                normType = ExpressionSubstitutionNormType.original
+            }
             let substitution = ExpressionSubstitutionsAPIKt.expressionSubstitutionFromStructureStrings(
                 leftStructureString: rule["leftStructureString"] as? String ?? "",
                 rightStructureString: rule["rightStructureString"] as? String ?? "",
@@ -113,8 +128,7 @@ import MathResolverLib
                 code: rule["code"] as? String ?? "",
                 nameEn: rule["nameEn"] as? String ?? "",
                 nameRu: rule["nameRu"] as? String ?? "",
-                normalizationType: ExpressionSubstitutionNormType
-                    .value(forKey: (rule["normalizationType"] as? String ?? "ORIGINAL").lowercased()) as! ExpressionSubstitutionNormType,
+                normalizationType: normType,
                 weight: rule["weight"] as? Double ?? 0,
                 weightInTaskAutoGeneration: rule["weightInTaskAutoGeneration"] as? Double ?? 0,
                 useWhenPostprocessGeneratedExpression: rule["weightInTaskAutoGeneration"] as? Bool ?? false

@@ -36,20 +36,23 @@ class MainActivity: FlutterActivity() {
     private fun resolveExpression(call: MethodCall, res: MethodChannel.Result) {
         val expression = call.argument<String>("expression")
         val structured = call.argument<Boolean>("structured") ?: true
-        val isRule = call.argument<Boolean>("isRule") ?: false
+        val interactive = call.argument<Boolean>("interactive") ?: false
         if (expression != null) {
             val pair = MathResolver.resolveToPlain(expression, structureString = structured)
-            if (!isRule) {
+            if (interactive) {
                 currentExpressionPair = pair
             }
-            res.success(pair.matrix.joinToString("\n"))
+            if (pair.tree != null) {
+                res.success(pair.matrix.joinToString("\n"))
+            } else {
+                res.error("resolveExpression", "Failed to resolve $expression", null)
+            }
         } else {
             res.error("resolveExpression", "Bad arguments: ${call.arguments}", null)
         }
     }
 
     private fun getNodeByTouch(call: MethodCall, res: MethodChannel.Result) {
-        println("ANDROID getNodeByTouch")
         val coords = call.argument<List<Int>>("coords")
         if (coords != null) {
             val nodeCoords = currentExpressionPair?.getNodeByCoords(coords[0], coords[1])
@@ -71,7 +74,6 @@ class MainActivity: FlutterActivity() {
     }
 
     private fun getSubstitutionInfo(call: MethodCall, res: MethodChannel.Result) {
-        println("ANDROID getSubstitutionInfo")
         val ids = call.argument<List<Int>>("ids")
         if (ids != null) {
             val substitutionApplication = findApplicableSubstitutionsInSelectedPlace(
@@ -107,6 +109,12 @@ class MainActivity: FlutterActivity() {
         val rules = call.argument<List<Map<String, *>>>("rules")
         val subs = arrayListOf<ExpressionSubstitution>()
         for (rule in rules ?: listOf()) {
+            val normType = when (rule["normalizationType"] as String) {
+                "SORTED_AND_I_MULTIPLICATED" -> ExpressionSubstitutionNormType.SORTED_AND_I_MULTIPLICATED
+                "I_MULTIPLICATED" -> ExpressionSubstitutionNormType.I_MULTIPLICATED
+                "SORTED" -> ExpressionSubstitutionNormType.SORTED
+                else -> ExpressionSubstitutionNormType.ORIGINAL
+            }
             val substitution = expressionSubstitutionFromStructureStrings(
                 leftStructureString = rule["leftStructureString"] as String,
                 rightStructureString = rule["rightStructureString"] as String,
@@ -118,7 +126,7 @@ class MainActivity: FlutterActivity() {
                 code = rule["code"] as String,
                 nameEn = rule["nameEn"] as String,
                 nameRu = rule["nameRu"] as String,
-                normalizationType = ExpressionSubstitutionNormType.valueOf(rule["normalizationType"] as String)
+                normalizationType = normType
             )
             subs.add(substitution)
         }
