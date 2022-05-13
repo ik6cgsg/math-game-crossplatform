@@ -18,29 +18,27 @@ class SelectNode implements UseCase<StepState, Params> {
     log.info('Usecase::SelectNode($params)');
     final prevStep = params.currentStep;
     if (params.tap == null) {
+      // todo log unselect?
       return Right(StepState(prevStep.currentExpression, prevStep.multiselectMode, null, null, prevStep.stepCount));
     }
     final selectInfo = await repository.getNodeByTouch(params.tap!);
     log.info('Usecase::SelectNode: selectInfo = $selectInfo');
-    Set<NodeSelectionInfo>? newSelectionInfoList = prevStep.selectionInfo == null ? null : Set.from(prevStep.selectionInfo!);
+    var newSelectionInfoList = {...?prevStep.selectionInfo};
     return selectInfo.fold(
       (fail) => Left(fail),
       (selectInfo) async {
-        var alreadyHave = newSelectionInfoList?.any((e) => e.nodeId == selectInfo.nodeId);
+        var alreadyHave = newSelectionInfoList.any((e) => e.nodeId == selectInfo.nodeId);
         if (alreadyHave == true) {
-          newSelectionInfoList?.removeWhere((e) => e.nodeId == selectInfo.nodeId);
-          if (newSelectionInfoList?.isEmpty == true) {
-            newSelectionInfoList = null;
-          }
+          newSelectionInfoList.removeWhere((e) => e.nodeId == selectInfo.nodeId);
         } else if (prevStep.multiselectMode) {
-          newSelectionInfoList ??= {};
-          newSelectionInfoList?.add(selectInfo);
+          newSelectionInfoList.add(selectInfo);
         } else {
           newSelectionInfoList = {selectInfo};
         }
-        if (newSelectionInfoList != null) {
-          final substInfo = await repository.getSubstitutionInfo(newSelectionInfoList!.map((e) => e.nodeId).toList());
+        if (newSelectionInfoList.isNotEmpty) {
+          final substInfo = await repository.getSubstitutionInfo(newSelectionInfoList.map((e) => e.nodeId).toList());
           log.info('Usecase::SelectNode: substInfo = $substInfo');
+          // todo: log select
           return substInfo.fold(
             (fail) => Left(fail),
             (substInfo) => Right(StepState(
@@ -52,6 +50,7 @@ class SelectNode implements UseCase<StepState, Params> {
             ))
           );
         } else {
+          // todo: log select
           return Right(StepState(prevStep.currentExpression, prevStep.multiselectMode, null, null, prevStep.stepCount));
         }
       }

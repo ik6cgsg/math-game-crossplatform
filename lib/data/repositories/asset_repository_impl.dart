@@ -15,12 +15,13 @@ class AssetRepositoryImpl implements AssetRepository {
   final AssetDataSource assetDataSource;
   final PlatformDataSource platformDataSource;
 
-  late final FullTasksetModel? _fullTaskset;
+  FullTasksetModel? _fullTaskset;
 
   AssetRepositoryImpl(this.assetDataSource, this.platformDataSource);
 
   @override
   Future<Either<Failure, Taskset>> loadFullTaskset() async {
+    if (_fullTaskset != null) return Right(_fullTaskset!.taskset);
     try {
       _fullTaskset = await assetDataSource.getFullTaskset();
       if (_fullTaskset == null) {
