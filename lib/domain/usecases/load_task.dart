@@ -21,7 +21,7 @@ class LoadTask implements UseCase<TaskWithResult, Params> {
     return await task.fold(
       (fail) async => Left(fail),
       (task) async {
-        final res = await localRepository.loadResultFor(params.number);
+        final res = await localRepository.loadResultFor(task.code);
         return res.fold(
             (fail) => Right(TaskWithResult(task, null)),
             (result) => Right(TaskWithResult(task, result))

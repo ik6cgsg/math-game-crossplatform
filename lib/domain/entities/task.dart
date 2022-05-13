@@ -57,3 +57,14 @@ class Task extends Equatable {
     otherCheckSolutionData, otherAwardData, otherData
   ];
 }
+
+class TaskInfo extends Equatable {
+  final String namespaceCode;
+  final String code;
+  final int version;
+
+  const TaskInfo(this.namespaceCode, this.code, this.version);
+
+  @override
+  List<Object?> get props => [namespaceCode, code, version];
+}

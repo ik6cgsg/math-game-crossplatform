@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 abstract class LocalDataSource {
   Future<void> saveLevelResult(ResultModel result);
   Future<List<ResultModel>> loadAllResults();
-  Future<ResultModel> loadResultFor(int i);
+  Future<ResultModel> loadResultFor(String code);
 }
 
 const kStorageDBName = 'local_storage.db';
@@ -20,7 +20,7 @@ class LocalDataSourceImpl implements LocalDataSource {
         return db.execute(
           '''
           CREATE TABLE $kResultTable(
-              level_index INTEGER PRIMARY KEY, 
+              task_code TEXT PRIMARY KEY, 
               expression TEXT, 
               step_count INTEGER,
               state TEXT
@@ -38,9 +38,9 @@ class LocalDataSourceImpl implements LocalDataSource {
     final db = await _database();
     await db.execute(
       '''
-      REPLACE INTO $kResultTable (level_index, expression, step_count, state) VALUES (?,?,?,?)
+      REPLACE INTO $kResultTable (task_code, expression, step_count, state) VALUES (?,?,?,?)
       ''',
-      [result.levelIndex, result.expression, result.stepCount, result.state.toString()]
+      [result.taskCode, result.expression, result.stepCount, result.state.toString()]
     );
   }
 
@@ -52,7 +52,7 @@ class LocalDataSourceImpl implements LocalDataSource {
     log.info('LocalDataSourceImpl::loadAllResults: query res = $maps');
     return List.generate(maps.length, (i) {
       return ResultModel(
-        maps[i]['level_index'],
+        maps[i]['task_code'],
         maps[i]['expression'],
         maps[i]['step_count'],
         maps[i]['state']
@@ -61,13 +61,13 @@ class LocalDataSourceImpl implements LocalDataSource {
   }
 
   @override
-  Future<ResultModel> loadResultFor(int i) async {
-    log.info('LocalDataSourceImpl::loadResultFor($i)');
+  Future<ResultModel> loadResultFor(String code) async {
+    log.info('LocalDataSourceImpl::loadResultFor($code)');
     final db = await _database();
-    final List<Map<String, dynamic>> maps = await db.query(kResultTable, where: 'level_index = ?', whereArgs: [i]);
+    final List<Map<String, dynamic>> maps = await db.query(kResultTable, where: 'task_code = ?', whereArgs: [code]);
     log.info('LocalDataSourceImpl::loadResultFor: query res = $maps');
     return ResultModel(
-        maps[0]['level_index'],
+        maps[0]['task_code'],
         maps[0]['expression'],
         maps[0]['step_count'],
         maps[0]['state']

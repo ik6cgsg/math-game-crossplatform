@@ -32,9 +32,9 @@ Future<void> init() async {
   di.registerLazySingleton(() => LoadTask(di(), di(),));
   di.registerLazySingleton(() => ResolveExpression(di(),));
   di.registerLazySingleton(() => SelectNode(di(),));
-  di.registerLazySingleton(() => PerformSubstitution(di(),));
+  di.registerLazySingleton(() => PerformSubstitution(di(), di(),));
   di.registerLazySingleton(() => CheckEnd(di(), di(), di(),));
-  di.registerLazySingleton(() => UndoStep(di(),));
+  di.registerLazySingleton(() => UndoStep(di(), di(),));
 
   // Repository
   di.registerLazySingleton<AssetRepository>(

@@ -7,5 +7,6 @@ import '../../core/failures.dart';
 abstract class AssetRepository {
   Future<Either<Failure, Taskset>> loadFullTaskset();
   Future<Either<Failure, Task>> loadTask(int i);
+  Either<Failure, TaskInfo> getTaskInfo(int i);
   int? get tasksCount;
 }

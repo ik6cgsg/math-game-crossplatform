@@ -29,9 +29,9 @@ class LocalRepositoryImpl implements LocalRepository {
   }
 
   @override
-  Future<Either<Failure, Result>> loadResultFor(int i) async {
+  Future<Either<Failure, Result>> loadResultFor(String code) async {
     try {
-      return Right(await localDataSource.loadResultFor(i));
+      return Right(await localDataSource.loadResultFor(code));
     } catch(_) {
       return Left(LocalStorageFailure());
     }

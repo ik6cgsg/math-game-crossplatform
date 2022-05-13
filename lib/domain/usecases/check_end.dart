@@ -32,8 +32,13 @@ class CheckEnd implements UseCase<PassedData, Params> {
       (passed) {
         if (passed) {
           // todo log passed
-          localRepository.saveLevelResult(Result(params.levelIndex, params.currentExpression, params.stepCount, LevelState.passed));
-          return Right(PassedData(true, params.levelIndex > 0, params.levelIndex < len! - 1));
+          return assetRepository.getTaskInfo(params.levelIndex).fold(
+            (fail) => Left(fail),
+            (info) {
+              localRepository.saveLevelResult(Result(info.code, params.currentExpression, params.stepCount, LevelState.passed));
+              return Right(PassedData(true, params.levelIndex > 0, params.levelIndex < len! - 1));
+            }
+          );
         }
         return const Right(PassedData(false, null, null));
       }

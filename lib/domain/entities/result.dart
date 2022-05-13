@@ -8,13 +8,13 @@ enum LevelState {
 }
 
 class Result extends Equatable {
-  final int levelIndex;
+  final String taskCode;
   final String expression;
   final int stepCount;
   final LevelState state;
 
-  const Result(this.levelIndex, this.expression, this.stepCount, this.state);
+  const Result(this.taskCode, this.expression, this.stepCount, this.state);
 
   @override
-  List<Object> get props => [levelIndex, expression, stepCount, state];
+  List<Object> get props => [taskCode, expression, stepCount, state];
 }

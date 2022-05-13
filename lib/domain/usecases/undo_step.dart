@@ -14,20 +14,26 @@ import '../../core/usecase.dart';
 class NoStepsForUndoFailure extends Failure {}
 
 class UndoStep implements UseCase<List<Step>, Params> {
+  final AssetRepository assetRepository;
   final LocalRepository localRepository;
 
-  UndoStep(this.localRepository);
+  UndoStep(this.assetRepository, this.localRepository);
 
   @override
   Future<Either<Failure, List<Step>>> call(Params params) async {
+    // todo: log undo
     if (params.steps.length < 2) return Left(NoStepsForUndoFailure());
     final history = [...params.steps];
     final old = history.removeLast();
     if (history.last.state.stepCount != old.state.stepCount) {
-      final saveRes = await localRepository.saveLevelResult(Result(params.levelIndex, history.last.state.currentExpression, history.last.state.stepCount, LevelState.paused));
-      return saveRes.fold(
+      return assetRepository.getTaskInfo(params.levelIndex).fold(
         (fail) => Left(fail),
-        (_) => Right([...history])
+        (info) {
+          localRepository.saveLevelResult(
+            Result(info.code, history.last.state.currentExpression, history.last.state.stepCount, LevelState.paused)
+          );
+          return Right([...history]);
+        }
       );
     }
     return Right([...history]);

@@ -44,7 +44,20 @@ class AssetRepositoryImpl implements AssetRepository {
       return Right(task);
     } on PlatformException {
       return Left(PlatformFailure());
-    }  catch(_) {
+    } catch(_) {
+      return Left(AssetFailure());
+    }
+  }
+
+  @override
+  Either<Failure, TaskInfo> getTaskInfo(int i) {
+    if (_fullTaskset == null) {
+      return Left(AssetFailure());
+    }
+    try {
+      final task = _fullTaskset!.taskset.tasks[i];
+      return Right(TaskInfo(task.namespaceCode, task.code, task.version));
+    } catch(_) {
       return Left(AssetFailure());
     }
   }

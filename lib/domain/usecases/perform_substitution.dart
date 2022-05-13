@@ -4,15 +4,17 @@ import 'package:math_game_crossplatform/core/failures.dart';
 import 'package:math_game_crossplatform/domain/entities/platform_entities.dart';
 import 'package:math_game_crossplatform/domain/entities/result.dart';
 import 'package:math_game_crossplatform/domain/entities/step_state.dart';
+import 'package:math_game_crossplatform/domain/repositories/asset_repository.dart';
 import 'package:math_game_crossplatform/domain/repositories/local_repository.dart';
 import 'package:math_game_crossplatform/domain/repositories/platform_repository.dart';
 
 import '../../core/usecase.dart';
 
 class PerformSubstitution implements UseCase<StepState, Params> {
-  final LocalRepository repository;
+  final AssetRepository assetRepository;
+  final LocalRepository localRepository;
 
-  PerformSubstitution(this.repository);
+  PerformSubstitution(this.assetRepository, this.localRepository);
 
   @override
   Future<Either<Failure, StepState>> call(Params params) async {
@@ -21,9 +23,15 @@ class PerformSubstitution implements UseCase<StepState, Params> {
     if (params.ruleIndex >= substitutionInfo.results.length) return Left(InternalFailure());
     final currentExpression = substitutionInfo.results[params.ruleIndex];
     final step = StepState(currentExpression, params.currentStep.multiselectMode, null, null, params.currentStep.stepCount + 1);
-    repository.saveLevelResult(Result(params.levelIndex, step.currentExpression, step.stepCount, LevelState.paused));
-    // todo: log subst
-    return Right(step);
+    return assetRepository.getTaskInfo(params.levelIndex).fold(
+      (fail) => Left(fail),
+      (info) {
+        localRepository.saveLevelResult(
+            Result(info.code, step.currentExpression, step.stepCount, LevelState.paused));
+        // todo: log subst
+        return Right(step);
+      }
+    );
   }
 }
 

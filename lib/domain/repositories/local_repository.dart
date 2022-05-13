@@ -8,5 +8,5 @@ import '../../core/failures.dart';
 abstract class LocalRepository {
   Future<Either<Failure, void>> saveLevelResult(Result result);
   Future<Either<Failure, List<Result>>> loadAllResults();
-  Future<Either<Failure, Result>> loadResultFor(int i);
+  Future<Either<Failure, Result>> loadResultFor(String code);
 }
