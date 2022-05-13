@@ -21,12 +21,12 @@ class RulesListView extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(5.0),
           alignment: Alignment.center,
-          child: step.substitutionInfo == null ?
+          child: step.state.substitutionInfo == null ?
           const NoRulesView() :
           SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: step.substitutionInfo!.rules.asMap().entries.map((pair) {
+              children: step.state.substitutionInfo!.rules.asMap().entries.map((pair) {
                 return RuleMathView(
                   pair.value,
                   () => playBloc.add(RuleSelectedEvent(pair.key)),

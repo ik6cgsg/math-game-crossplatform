@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:math_game_crossplatform/domain/entities/result.dart';
 import 'package:math_game_crossplatform/domain/entities/taskset.dart';
 import 'package:math_game_crossplatform/presentation/blocs/game/game_event.dart';
 import 'package:math_game_crossplatform/presentation/blocs/game/game_state.dart';
@@ -28,7 +30,7 @@ class GameScreen extends StatelessWidget {
           child: BlocBuilder<GameBloc, GameState>(
             builder: (context, state) {
               if (state is Loading) return _loadingBody(context);
-              if (state is Loaded) return _loadedBody(context, state.taskset);
+              if (state is Loaded) return _loadedBody(context, state);
               return Center(
                 child: Text(
                   (state as Error).message,
@@ -55,20 +57,27 @@ class GameScreen extends StatelessWidget {
     );
   }
 
-  Widget _loadedBody(BuildContext context, Taskset set) {
+  Widget _loadedBody(BuildContext context, Loaded state) {
     var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return GridView.builder(
       padding: const EdgeInsets.all(10),
-      itemCount: set.tasks.length,
+      itemCount: state.taskset.tasks.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: isPortrait ? 2 : 3,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
         childAspectRatio: 3 / 2,
       ),
-      itemBuilder: (ctx, i) => LevelView(i, set.tasks[i].descriptionShortRu, () {
-        Navigator.of(ctx).pushNamed(PlayScreen.routeName, arguments: i);
-      }),
+      itemBuilder: (ctx, i) => LevelView(
+        i,
+        state.taskset.tasks[i].descriptionShortRu,
+        state.results?.firstWhereOrNull((e) => e.levelIndex == i),
+        () {
+          Navigator.of(ctx).pushNamed(PlayScreen.routeName, arguments: i).then((_) {
+            BlocProvider.of<GameBloc>(context).add(LoadTasksetEvent());
+          });
+        }
+      ),
     );
   }
 }

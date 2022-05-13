@@ -31,8 +31,8 @@ class _MainMathViewState extends State<MainMathView> {
       create: (_) => di<ResolverBloc>(),
       child: BlocBuilder<ResolverBloc, ResolverState>(builder: (context, state) {
         if (playState is Step) {
-          if (_currentExpression != playState.currentExpression) {
-            _currentExpression = playState.currentExpression;
+          if (_currentExpression != playState.state.currentExpression) {
+            _currentExpression = playState.state.currentExpression;
             BlocProvider.of<ResolverBloc>(context).add(Resolve(_currentExpression, true, true));
           }
           if (state is Resolving) return _loadingBody(context);
@@ -85,7 +85,7 @@ class _MainMathViewState extends State<MainMathView> {
                   BlocProvider.of<PlayBloc>(context).add(ToggleMultiselectEvent(current));
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: playState.multiselectMode ?
+                    content: playState.state.multiselectMode ?
                     const Text('Режим мультивыбора отключен') :
                     const Text('Режим мультивыбора включен'),
                     action: SnackBarAction(
@@ -107,13 +107,13 @@ class _MainMathViewState extends State<MainMathView> {
 
   Color? _getSelectionColor(BuildContext context, Point cur, Step playState) {
     int selectedTimes = 0;
-    playState.selectionInfo?.forEach((info) {
+    playState.state.selectionInfo?.forEach((info) {
       if (cur.isInside(info.selection)) {
         selectedTimes++;
       }
     });
     if (selectedTimes > 0) {
-      if (!playState.multiselectMode) {
+      if (!playState.state.multiselectMode) {
         return Theme.of(context).primaryColor;
       } else {
         final hsl = HSLColor.fromColor(CustomColors.multiselect1);

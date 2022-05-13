@@ -79,16 +79,15 @@ class _PlayScreenState extends State<PlayScreen> {
           color: Theme.of(context).backgroundColor,
           tooltip: 'Перезапуск уровня',
           onPressed: int.tryParse(index) == null ? null : () {
-            BlocProvider.of<PlayBloc>(context).add(LoadTaskEvent(int.parse(index)));
+            playBloc.add(LoadTaskEvent(int.parse(index), fetchResult: false));
           },
         ),
         IconButton(
           icon: const Icon(Icons.undo_rounded),
           color: Theme.of(context).backgroundColor,
           tooltip: 'Отмена действия',
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('To be developed')));
+          onPressed: !playBloc.canUndo ? null : () {
+            playBloc.add(UndoEvent());
           },
         ),
       ],
@@ -162,6 +161,7 @@ class _PlayScreenState extends State<PlayScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FloatingActionButton.extended(
+            heroTag: 'prev',
             label: const Icon(Icons.arrow_back_rounded),
             tooltip: 'Предыдущий уровень',
             backgroundColor: !info.hasPrev ? Colors.grey : Theme.of(context).primaryColor,
@@ -171,14 +171,16 @@ class _PlayScreenState extends State<PlayScreen> {
           ),
           const SizedBox(width: 30,),
           FloatingActionButton.extended(
+            heroTag: 'reload',
             label: const Icon(Icons.repeat_rounded),
             tooltip: 'Перезапуск уровня',
             onPressed: () {
-              bloc.add(LoadTaskEvent(bloc.levelIndex));
+              bloc.add(LoadTaskEvent(bloc.levelIndex, fetchResult: false));
             },
           ),
           const SizedBox(width: 30,),
           FloatingActionButton.extended(
+            heroTag: 'next',
             label: const Icon(Icons.arrow_forward_rounded),
             tooltip: 'Следующий уровень',
             backgroundColor: !info.hasNext ? Colors.grey : Theme.of(context).primaryColor,
@@ -217,11 +219,11 @@ class _PlayScreenState extends State<PlayScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _emojiButton('😭️'),
-                _emojiButton('🙁'),
-                _emojiButton('🤨'),
-                _emojiButton('🙂'),
-                _emojiButton('😊'),
+                _emojiButton(context, '😭️'),
+                _emojiButton(context, '🙁'),
+                _emojiButton(context, '🤨'),
+                _emojiButton(context, '🙂'),
+                _emojiButton(context, '😊'),
               ],
             ),
           )
@@ -230,11 +232,19 @@ class _PlayScreenState extends State<PlayScreen> {
     );
   }
 
-  Widget _emojiButton(String smile) {
+  Widget _emojiButton(BuildContext context, String smile) {
     return Card(
         child: InkWell (
           borderRadius: const BorderRadius.all(Radius.circular(UIConstants.borderRadius)),
-          onTap: (){},
+          onTap: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('Спасибо за оценку!'),
+              action: SnackBarAction(label: '👌', onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              }),
+            ));
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Text(smile),

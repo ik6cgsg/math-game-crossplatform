@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:math_game_crossplatform/domain/entities/platform_entities.dart';
+import 'package:math_game_crossplatform/domain/entities/step_state.dart';
 import 'package:math_game_crossplatform/domain/entities/taskset.dart';
 
 abstract class PlayState extends Equatable {
@@ -10,15 +11,12 @@ abstract class PlayState extends Equatable {
 class Loading extends PlayState {}
 
 class Step extends PlayState {
-  final String currentExpression;
-  final bool multiselectMode;
-  final Set<NodeSelectionInfo>? selectionInfo;
-  final SubstitutionInfo? substitutionInfo;
+  final StepState state;
 
-  Step(this.currentExpression, this.multiselectMode, this.selectionInfo, this.substitutionInfo);
+  Step(this.state);
 
   @override
-  List<Object?> get props => [currentExpression, multiselectMode, selectionInfo, substitutionInfo];
+  List<Object?> get props => [state];
 }
 
 class Passed extends PlayState {

@@ -8,11 +8,12 @@ abstract class PlayEvent extends Equatable {
 
 class LoadTaskEvent extends PlayEvent {
   final int index;
+  final bool fetchResult;
 
-  LoadTaskEvent(this.index);
+  LoadTaskEvent(this.index, {this.fetchResult = true});
 
   @override
-  List<Object?> get props => [index];
+  List<Object?> get props => [index, fetchResult];
 }
 
 class NodeSelectedEvent extends PlayEvent {
@@ -41,3 +42,5 @@ class ToggleMultiselectEvent extends PlayEvent {
   @override
   List<Object?> get props => [tap];
 }
+
+class UndoEvent extends PlayEvent {}

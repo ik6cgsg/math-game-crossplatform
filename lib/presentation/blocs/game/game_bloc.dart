@@ -19,7 +19,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       log.info('GameBloc::LoadTasksetEvent: res = $res');
       res.fold(
         (failure) => emit(Error(kErrorLoadTaskset)),
-        (taskset) => emit(Loaded(taskset)),
+        (res) => emit(Loaded(res.taskset, res.results)),
       );
     });
   }
