@@ -18,7 +18,7 @@ class PerformSubstitution implements UseCase<StepState, Params> {
     if (substitutionInfo == null) return Left(InternalFailure());
     if (params.index >= substitutionInfo.results.length) return Left(InternalFailure());
     final currentExpression = substitutionInfo.results[params.index];
-    return Right(StepState(currentExpression, params.currentStep.multiselectMode, null, null));
+    return Right(StepState(currentExpression, params.currentStep.multiselectMode, null, null, params.currentStep.stepCount + 1));
   }
 }
 

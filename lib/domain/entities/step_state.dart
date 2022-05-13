@@ -6,9 +6,10 @@ class StepState extends Equatable {
   final bool multiselectMode;
   final Set<NodeSelectionInfo>? selectionInfo;
   final SubstitutionInfo? substitutionInfo;
+  final int stepCount;
 
-  const StepState(this.currentExpression, this.multiselectMode, this.selectionInfo, this.substitutionInfo);
+  const StepState(this.currentExpression, this.multiselectMode, this.selectionInfo, this.substitutionInfo, this.stepCount);
 
   @override
-  List<Object?> get props => [currentExpression, multiselectMode, selectionInfo, substitutionInfo];
+  List<Object?> get props => [currentExpression, multiselectMode, selectionInfo, substitutionInfo, stepCount];
 }

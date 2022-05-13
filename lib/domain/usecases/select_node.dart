@@ -18,11 +18,11 @@ class SelectNode implements UseCase<StepState, Params> {
     log.info('Usecase::SelectNode($params)');
     final prevStep = params.currentStep;
     if (params.tap == null) {
-      return Right(StepState(prevStep.currentExpression, prevStep.multiselectMode, null, null));
+      return Right(StepState(prevStep.currentExpression, prevStep.multiselectMode, null, null, prevStep.stepCount));
     }
     final selectInfo = await repository.getNodeByTouch(params.tap!);
     log.info('Usecase::SelectNode: selectInfo = $selectInfo');
-    var newSelectionInfoList = prevStep.selectionInfo;
+    Set<NodeSelectionInfo>? newSelectionInfoList = prevStep.selectionInfo == null ? null : Set.from(prevStep.selectionInfo!);
     return selectInfo.fold(
       (fail) => Left(fail),
       (selectInfo) async {
@@ -43,10 +43,16 @@ class SelectNode implements UseCase<StepState, Params> {
           log.info('Usecase::SelectNode: substInfo = $substInfo');
           return substInfo.fold(
             (fail) => Left(fail),
-            (substInfo) => Right(StepState(prevStep.currentExpression, prevStep.multiselectMode, newSelectionInfoList, substInfo))
+            (substInfo) => Right(StepState(
+                prevStep.currentExpression,
+                prevStep.multiselectMode,
+                newSelectionInfoList,
+                substInfo,
+                prevStep.stepCount
+            ))
           );
         } else {
-          return Right(StepState(prevStep.currentExpression, prevStep.multiselectMode, null, null));
+          return Right(StepState(prevStep.currentExpression, prevStep.multiselectMode, null, null, prevStep.stepCount));
         }
       }
     );

@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:math_game_crossplatform/data/datasources/asset_data_source.dart';
 import 'package:math_game_crossplatform/data/datasources/local_data_source.dart';
 import 'package:math_game_crossplatform/data/datasources/platform_data_source.dart';
 import 'package:math_game_crossplatform/data/repositories/asset_repository_impl.dart';
@@ -40,8 +41,8 @@ Future<void> init() async {
   );
 
   // Data sources
-  di.registerLazySingleton<LocalDataSource>(
-    () => LocalDataSourceImpl(),
+  di.registerLazySingleton<AssetDataSource>(
+    () => AssetDataSourceImpl(),
   );
   di.registerLazySingleton<PlatformDataSource>(
     () => PlatformDataSourceImpl(),

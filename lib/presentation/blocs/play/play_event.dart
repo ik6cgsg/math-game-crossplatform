@@ -41,3 +41,5 @@ class ToggleMultiselectEvent extends PlayEvent {
   @override
   List<Object?> get props => [tap];
 }
+
+class UndoEvent extends PlayEvent {}

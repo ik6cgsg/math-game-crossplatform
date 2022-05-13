@@ -10,6 +10,7 @@ class Loading extends GameState {}
 
 class Loaded extends GameState {
   final Taskset taskset;
+  // todo add results
 
   Loaded(this.taskset);
 

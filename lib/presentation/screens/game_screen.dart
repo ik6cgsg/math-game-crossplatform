@@ -67,7 +67,9 @@ class GameScreen extends StatelessWidget {
         childAspectRatio: 3 / 2,
       ),
       itemBuilder: (ctx, i) => LevelView(i, set.tasks[i].descriptionShortRu, () {
-        Navigator.of(ctx).pushNamed(PlayScreen.routeName, arguments: i);
+        Navigator.of(ctx).pushNamed(PlayScreen.routeName, arguments: i).then((_) {
+          // todo add state reload all results
+        });
       }),
     );
   }

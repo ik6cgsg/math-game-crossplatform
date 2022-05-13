@@ -11,7 +11,7 @@ class Point extends Equatable {
   String toString() => '($x, $y)';
 
   @override
-  List<Object?> get props => [x, y];
+  List<Object> get props => [x, y];
 }
 
 class SelectionBox extends Equatable {
@@ -20,7 +20,7 @@ class SelectionBox extends Equatable {
   const SelectionBox(this.lt, this.rb);
 
   @override
-  List<Object?> get props => [lt, rb];
+  List<Object> get props => [lt, rb];
 }
 
 class ResolutionInput extends Equatable {
@@ -30,7 +30,7 @@ class ResolutionInput extends Equatable {
   const ResolutionInput(this.expressionStr, this.isStructured, this.isInteractive);
 
   @override
-  List<Object?> get props => [expressionStr, isStructured, isInteractive];
+  List<Object> get props => [expressionStr, isStructured, isInteractive];
 }
 
 class NodeSelectionInfo extends Equatable {
@@ -41,7 +41,7 @@ class NodeSelectionInfo extends Equatable {
   const NodeSelectionInfo(this.expression, this.nodeId, this.selection);
 
   @override
-  List<Object?> get props => [expression, nodeId, selection];
+  List<Object> get props => [expression, nodeId, selection];
 }
 
 class SubstitutionInfo extends Equatable {
@@ -51,7 +51,7 @@ class SubstitutionInfo extends Equatable {
   const SubstitutionInfo(this.rules, this.results);
 
   @override
-  List<Object?> get props => [rules, results];
+  List<Object> get props => [rules, results];
 }
 
 class CheckEndInput extends Equatable {
@@ -60,5 +60,5 @@ class CheckEndInput extends Equatable {
   const CheckEndInput(this.expression, this.goalExpression, this.goalPattern);
 
   @override
-  List<Object?> get props => [expression, goalExpression, goalPattern];
+  List<Object> get props => [expression, goalExpression, goalPattern];
 }

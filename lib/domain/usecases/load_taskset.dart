@@ -5,6 +5,7 @@ import 'package:math_game_crossplatform/domain/repositories/asset_repository.dar
 
 import '../../core/usecase.dart';
 
+// todo TasksetWithResult
 class LoadTaskset implements UseCase<Taskset, NoParams> {
   final AssetRepository repository;
 

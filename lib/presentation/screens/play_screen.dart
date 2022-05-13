@@ -79,16 +79,15 @@ class _PlayScreenState extends State<PlayScreen> {
           color: Theme.of(context).backgroundColor,
           tooltip: 'Перезапуск уровня',
           onPressed: int.tryParse(index) == null ? null : () {
-            BlocProvider.of<PlayBloc>(context).add(LoadTaskEvent(int.parse(index)));
+            playBloc.add(LoadTaskEvent(int.parse(index)));
           },
         ),
         IconButton(
           icon: const Icon(Icons.undo_rounded),
           color: Theme.of(context).backgroundColor,
           tooltip: 'Отмена действия',
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('To be developed')));
+          onPressed: !playBloc.canUndo ? null : () {
+            playBloc.add(UndoEvent());
           },
         ),
       ],
