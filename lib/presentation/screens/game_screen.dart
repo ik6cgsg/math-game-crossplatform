@@ -31,12 +31,7 @@ class GameScreen extends StatelessWidget {
             builder: (context, state) {
               if (state is Loading) return _loadingBody(context);
               if (state is Loaded) return _loadedBody(context, state);
-              return Center(
-                child: Text(
-                  (state as Error).message,
-                  style: Theme.of(context).textTheme.headline1,
-                )
-              );
+              return _errorBody(context, (state as Error).message);
             },
           ),
         ),
@@ -78,6 +73,26 @@ class GameScreen extends StatelessWidget {
           });
         }
       ),
+    );
+  }
+
+  Widget _errorBody(BuildContext context, String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.dangerous_rounded,
+            size: MediaQuery.of(context).size.shortestSide / 2,
+            color: Theme.of(context).primaryColor,
+          ),
+          SizedBox(height: 20,),
+          Text(
+            error,
+            style: Theme.of(context).textTheme.headline2
+          )
+        ]
+      )
     );
   }
 }

@@ -64,13 +64,18 @@ class RuleMathView extends StatelessWidget {
   }
 
   Widget _errorBody(BuildContext context, String error) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      width: MediaQuery.of(context).size.width,
-      child: Text(
-          error,
-          style: Theme.of(context).textTheme.bodyText1
-      ),
+    return Card(
+      color: Theme.of(context).errorColor.withOpacity(0.7),
+      elevation: 0,
+      margin: const EdgeInsets.only(top: 3, bottom: 3),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        width: double.infinity,
+        child: SelectableText(
+            error,
+            style: Theme.of(context).textTheme.bodyText1?.copyWith(height: 1)
+        ),
+      )
     );
   }
 }
