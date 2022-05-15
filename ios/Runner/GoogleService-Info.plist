@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>688165065706-21245ckakam9fjamn2k90veu9qs782ab.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.688165065706-21245ckakam9fjamn2k90veu9qs782ab</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCKO3cw32V5-VO67fU4c9KCOlaQ1Vb5-nU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>688165065706</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>mathhelper.games.mathGameCrossplatform</string>
+	<key>PROJECT_ID</key>
+	<string>mathhelper-community</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mathhelper-community.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:688165065706:ios:2e1e6169b3524b123f9893</string>
+	<key>DATABASE_URL</key>
+	<string>https://mathhelper-community.firebaseio.com</string>
+</dict>
+</plist>
