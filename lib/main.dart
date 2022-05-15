@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:math_game_crossplatform/di.dart' as di;
 import 'package:math_game_crossplatform/presentation/screens/play_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'core/logger.dart';
 import 'presentation/screens/game_screen.dart';
+import 'firebase_options.dart';
 
-void main() async {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await di.init();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   initLogger();
   runApp(const MyApp());
 }

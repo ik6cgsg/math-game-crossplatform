@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:math_game_crossplatform/data/models/stat_models.dart';
 import 'package:math_game_crossplatform/domain/entities/result.dart';
 import 'package:math_game_crossplatform/domain/entities/taskset.dart';
+import 'package:math_game_crossplatform/domain/repositories/remote_repository.dart';
 import 'package:math_game_crossplatform/presentation/blocs/game/game_event.dart';
 import 'package:math_game_crossplatform/presentation/blocs/game/game_state.dart';
 import 'package:math_game_crossplatform/presentation/screens/play_screen.dart';
@@ -69,6 +71,7 @@ class GameScreen extends StatelessWidget {
         state.results?.firstWhereOrNull((e) => e.taskCode == state.taskset.tasks[i].code),
         () {
           Navigator.of(ctx).pushNamed(PlayScreen.routeName, arguments: i).then((_) {
+            di<RemoteRepository>().logEvent(const StatisticActionScreenClose('PlayScreen'));
             BlocProvider.of<GameBloc>(context).add(LoadTasksetEvent());
           });
         }

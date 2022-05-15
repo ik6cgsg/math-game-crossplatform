@@ -1,22 +1,26 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:math_game_crossplatform/core/failures.dart';
+import 'package:math_game_crossplatform/data/models/stat_models.dart';
 import 'package:math_game_crossplatform/domain/entities/result.dart';
 import 'package:math_game_crossplatform/domain/entities/taskset.dart';
 import 'package:math_game_crossplatform/domain/repositories/asset_repository.dart';
 import 'package:math_game_crossplatform/domain/repositories/local_repository.dart';
+import 'package:math_game_crossplatform/domain/repositories/remote_repository.dart';
 
 import '../../core/usecase.dart';
 
 class LoadTaskset implements UseCase<TasksetWithResult, NoParams> {
-  final AssetRepository repository;
+  final AssetRepository assetRepository;
   final LocalRepository localRepository;
+  final RemoteRepository remoteRepository;
 
-  LoadTaskset(this.repository, this.localRepository);
+  LoadTaskset(this.assetRepository, this.localRepository, this.remoteRepository);
 
   @override
   Future<Either<Failure, TasksetWithResult>> call(NoParams params) async {
-    final res = await repository.loadFullTaskset();
+    remoteRepository.logEvent(const StatisticActionScreenOpen('GameScreen'));
+    final res = await assetRepository.loadFullTaskset();
     return await res.fold(
       (fail) async => Left(fail),
       (taskset) async {

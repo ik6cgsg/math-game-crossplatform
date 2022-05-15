@@ -26,11 +26,13 @@ class PlayBloc extends Bloc<PlayEvent, PlayState> {
   final us.UndoStep undoStep;
 
   late int _levelIndex;
+  late String _levelCode;
   late String? _goalExpression, _goalPattern;
-  late String _shortDescription;
+  late String _shortDescription, _startExpression;
   List<Step> _history = [];
 
   int get levelIndex => _levelIndex;
+  String get levelCode => _levelCode;
   String get goalExpression => _goalExpression ?? '';
   String get goalPattern => _goalPattern ?? '';
   String get shortDescription => _shortDescription;
@@ -38,6 +40,7 @@ class PlayBloc extends Bloc<PlayEvent, PlayState> {
 
   PlayBloc(this.loadTask, this.selectNode, this.performSubstitution, this.checkEnd, this.undoStep): super(Loading()) {
     on<LoadTaskEvent>(_handleLoadTaskEvent);
+    on<RestartEvent>(_handleRestartEvent);
     on<NodeSelectedEvent>(_handleNodeSelectedEvent);
     on<ToggleMultiselectEvent>(_handleToggleMultiselectEvent);
     on<RuleSelectedEvent>(_handleRuleSelectedEvent);
@@ -51,7 +54,6 @@ class PlayBloc extends Bloc<PlayEvent, PlayState> {
 
   void _handleLoadTaskEvent(LoadTaskEvent event, Emitter emit) async {
     emit(Loading());
-    // todo log start
     log.info('PlayBloc::LoadTaskEvent($event)');
     _levelIndex = event.index;
     _history = [];
@@ -67,16 +69,18 @@ class PlayBloc extends Bloc<PlayEvent, PlayState> {
         }
       },
       (data) async {
+        _levelCode = data.task.code;
         _goalExpression = data.task.goalExpressionStructureString;
         _goalPattern = data.task.goalPattern;
         _shortDescription = data.task.descriptionShortRu;
+        _startExpression = data.task.originalExpressionStructureString;
         var step = Step(StepState(data.task.originalExpressionStructureString, false, null, null, 0));
         log.info('PlayBloc::LoadTaskEvent: result = ${data.result}');
-        if (!event.fetchResult || data.result == null) {
+        if (data.result == null) {
           _emitStep(emit, step);
         } else {
           if (data.result!.state == LevelState.passed) {
-            final end = await checkEnd(ce.Params(levelIndex, '', '', '', 0, ignoreCheck: true));
+            final end = await checkEnd(ce.Params(levelIndex, levelCode, '', '', '', 0, ignoreCheck: true));
             end.fold(
               (failure) => emit(Error(kErrorSubstitutionFailed)),
               (passedData) => emit(Passed(passedData.hasPrev ?? false, passedData.hasNext ?? false))
@@ -87,6 +91,13 @@ class PlayBloc extends Bloc<PlayEvent, PlayState> {
         }
       },
     );
+  }
+
+  void _handleRestartEvent(RestartEvent event, Emitter emit) async {
+    emit(Loading());
+    log.info('PlayBloc::RestartEvent($event)');
+    _history = [];
+    _emitStep(emit, Step(StepState(_startExpression, false, null, null, 0)));
   }
 
   void _handleNodeSelectedEvent(NodeSelectedEvent event, Emitter emit) async {
@@ -130,7 +141,7 @@ class PlayBloc extends Bloc<PlayEvent, PlayState> {
       await res.fold(
         (failure) async => emit(Error(kErrorSubstitutionFailed)),
         (state) async {
-          final end = await checkEnd(ce.Params(levelIndex, state.currentExpression, goalExpression, goalPattern, state.stepCount));
+          final end = await checkEnd(ce.Params(levelIndex, levelCode, state.currentExpression, goalExpression, goalPattern, state.stepCount));
           log.info('PlayBloc::RuleSelectedEvent: checkEnd res = $end');
           end.fold(
             (failure) => emit(Error(kErrorSubstitutionFailed)),

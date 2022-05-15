@@ -2,26 +2,29 @@ import 'package:dartz/dartz.dart' hide Task;
 import 'package:equatable/equatable.dart';
 import 'package:math_game_crossplatform/core/failures.dart';
 import 'package:math_game_crossplatform/core/logger.dart';
+import 'package:math_game_crossplatform/data/models/stat_models.dart';
 import 'package:math_game_crossplatform/domain/entities/platform_entities.dart';
 import 'package:math_game_crossplatform/domain/entities/step_state.dart';
 import 'package:math_game_crossplatform/domain/repositories/platform_repository.dart';
+import 'package:math_game_crossplatform/domain/repositories/remote_repository.dart';
 
 import '../../core/usecase.dart';
 
 class SelectNode implements UseCase<StepState, Params> {
-  final PlatformRepository repository;
+  final PlatformRepository platformRepository;
+  final RemoteRepository remoteRepository;
 
-  SelectNode(this.repository);
+  SelectNode(this.platformRepository, this.remoteRepository);
 
   @override
   Future<Either<Failure, StepState>> call(Params params) async {
     log.info('Usecase::SelectNode($params)');
     final prevStep = params.currentStep;
     if (params.tap == null) {
-      // todo log unselect?
+      remoteRepository.logEvent(StatisticActionSelectNode(0, 0, params.currentStep.multiselectMode));
       return Right(StepState(prevStep.currentExpression, prevStep.multiselectMode, null, null, prevStep.stepCount));
     }
-    final selectInfo = await repository.getNodeByTouch(params.tap!);
+    final selectInfo = await platformRepository.getNodeByTouch(params.tap!);
     log.info('Usecase::SelectNode: selectInfo = $selectInfo');
     var newSelectionInfoList = {...?prevStep.selectionInfo};
     return selectInfo.fold(
@@ -36,21 +39,27 @@ class SelectNode implements UseCase<StepState, Params> {
           newSelectionInfoList = {selectInfo};
         }
         if (newSelectionInfoList.isNotEmpty) {
-          final substInfo = await repository.getSubstitutionInfo(newSelectionInfoList.map((e) => e.nodeId).toList());
+          final substInfo = await platformRepository.getSubstitutionInfo(newSelectionInfoList.map((e) => e.nodeId).toList());
           log.info('Usecase::SelectNode: substInfo = $substInfo');
-          // todo: log select
           return substInfo.fold(
             (fail) => Left(fail),
-            (substInfo) => Right(StepState(
+            (substInfo) {
+              remoteRepository.logEvent(StatisticActionSelectNode(
+                newSelectionInfoList.length,
+                substInfo.results.length,
+                params.currentStep.multiselectMode
+              ));
+              return Right(StepState(
                 prevStep.currentExpression,
                 prevStep.multiselectMode,
                 newSelectionInfoList,
                 substInfo,
                 prevStep.stepCount
-            ))
+              ));
+            }
           );
         } else {
-          // todo: log select
+          remoteRepository.logEvent(StatisticActionSelectNode(0, 0, params.currentStep.multiselectMode));
           return Right(StepState(prevStep.currentExpression, prevStep.multiselectMode, null, null, prevStep.stepCount));
         }
       }

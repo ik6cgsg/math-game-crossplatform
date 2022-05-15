@@ -1,12 +1,7 @@
-import 'package:dartz/dartz.dart' hide Task;
-import 'package:math_game_crossplatform/domain/entities/result.dart';
-import 'package:math_game_crossplatform/domain/entities/taskset.dart';
-import 'package:math_game_crossplatform/domain/entities/task.dart';
+import 'package:dartz/dartz.dart';
+import 'package:math_game_crossplatform/core/failures.dart';
+import 'package:math_game_crossplatform/data/models/stat_models.dart';
 
-import '../../core/failures.dart';
-
-abstract class LocalRepository {
-  Future<Either<Failure, void>> saveLevelResult(Result result);
-  Future<Either<Failure, List<Result>>> loadAllResults();
-  Future<Either<Failure, Result>> loadResultFor(String code);
+abstract class RemoteRepository {
+  Future<Either<Failure, void>> logEvent(StatisticAction action);
 }

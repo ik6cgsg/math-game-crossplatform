@@ -8,13 +8,14 @@ abstract class PlayEvent extends Equatable {
 
 class LoadTaskEvent extends PlayEvent {
   final int index;
-  final bool fetchResult;
 
-  LoadTaskEvent(this.index, {this.fetchResult = true});
+  LoadTaskEvent(this.index);
 
   @override
-  List<Object?> get props => [index, fetchResult];
+  List<Object?> get props => [index];
 }
+
+class RestartEvent extends PlayEvent {}
 
 class NodeSelectedEvent extends PlayEvent {
   final Point? tap;
