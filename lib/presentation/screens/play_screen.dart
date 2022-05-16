@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:math_game_crossplatform/core/logger.dart';
+import 'package:math_game_crossplatform/data/models/stat_models.dart';
+import 'package:math_game_crossplatform/domain/repositories/remote_repository.dart';
 import 'package:math_game_crossplatform/presentation/blocs/play/play_event.dart';
+import 'package:math_game_crossplatform/presentation/widgets/play/passed_view.dart';
 
 import '../../di.dart';
 import '../../main.dart';
@@ -22,10 +25,12 @@ class PlayScreen extends StatefulWidget {
 }
 
 class _PlayScreenState extends State<PlayScreen> {
+
   @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    di<RemoteRepository>().logEvent(const StatisticActionScreenOpen('PlayScreen'));
   }
 
   @override
@@ -47,7 +52,16 @@ class _PlayScreenState extends State<PlayScreen> {
             child: state is Loading ?
               _loadingBody(context) :
             state is Passed ?
-              _passedBody(context) :
+              PassedView((rate) {
+                di<RemoteRepository>().logEvent(StatisticActionLevelRate(BlocProvider.of<PlayBloc>(context).levelCode, rate));
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: const Text('Оценка отправлена, спасибо!'),
+                  action: SnackBarAction(label: '👌', onPressed: () {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  }),
+                ));
+              }) :
             state is Error ?
               _errorBody(context, state.message) :
             MediaQuery.of(context).orientation == Orientation.portrait ?
@@ -75,11 +89,12 @@ class _PlayScreenState extends State<PlayScreen> {
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.repeat_rounded),
+          icon: const Icon(Icons.refresh_rounded),
           color: Theme.of(context).backgroundColor,
           tooltip: 'Перезапуск уровня',
           onPressed: int.tryParse(index) == null ? null : () {
-            playBloc.add(LoadTaskEvent(int.parse(index), fetchResult: false));
+            di<RemoteRepository>().logEvent(StatisticActionRestart(playBloc.levelCode, playBloc.levelIndex));
+            playBloc.add(RestartEvent());
           },
         ),
         IconButton(
@@ -172,10 +187,11 @@ class _PlayScreenState extends State<PlayScreen> {
           const SizedBox(width: 30,),
           FloatingActionButton.extended(
             heroTag: 'reload',
-            label: const Icon(Icons.repeat_rounded),
+            label: const Icon(Icons.refresh_rounded),
             tooltip: 'Перезапуск уровня',
             onPressed: () {
-              bloc.add(LoadTaskEvent(bloc.levelIndex, fetchResult: false));
+              di<RemoteRepository>().logEvent(StatisticActionRestart(bloc.levelCode, bloc.levelIndex));
+              bloc.add(RestartEvent());
             },
           ),
           const SizedBox(width: 30,),
@@ -189,67 +205,6 @@ class _PlayScreenState extends State<PlayScreen> {
             },
           ),
         ]
-    );
-  }
-
-  Widget _passedBody(BuildContext context) {
-    var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    var h = MediaQuery.of(context).size.height;
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(height: isPortrait ? h / 3 : h / 6,),
-          Text(
-            '🎉 Уровень пройден 🎉',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 25)
-          ),
-          SizedBox(height: 30,),
-          Text(
-            'Как тебе уровень?',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headline1?.copyWith(fontStyle: FontStyle.normal)
-          ),
-          SizedBox(height: 10,),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _emojiButton(context, '😭️'),
-                _emojiButton(context, '🙁'),
-                _emojiButton(context, '🤨'),
-                _emojiButton(context, '🙂'),
-                _emojiButton(context, '😊'),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _emojiButton(BuildContext context, String smile) {
-    return Card(
-        child: InkWell (
-          borderRadius: const BorderRadius.all(Radius.circular(UIConstants.borderRadius)),
-          onTap: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Спасибо за оценку!'),
-              action: SnackBarAction(label: '👌', onPressed: () {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              }),
-            ));
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(smile),
-          ),
-        )
     );
   }
 

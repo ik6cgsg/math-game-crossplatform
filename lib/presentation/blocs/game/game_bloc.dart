@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:math_game_crossplatform/core/logger.dart';
 import 'package:math_game_crossplatform/core/usecase.dart';
@@ -19,7 +20,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       log.info('GameBloc::LoadTasksetEvent: res = $res');
       res.fold(
         (failure) => emit(Error(kErrorLoadTaskset)),
-        (res) => emit(Loaded(res.taskset, res.results)),
+        (res) {
+          emit(Loaded(res.taskset, res.results));
+        },
       );
     });
   }

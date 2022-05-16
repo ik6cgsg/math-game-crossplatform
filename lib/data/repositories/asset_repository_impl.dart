@@ -7,7 +7,6 @@ import 'package:math_game_crossplatform/domain/entities/taskset.dart';
 import 'package:math_game_crossplatform/domain/entities/task.dart';
 import 'package:math_game_crossplatform/domain/repositories/asset_repository.dart';
 
-import '../../core/exceptions.dart';
 import '../models/task_model.dart';
 import '../models/taskset_model.dart';
 
