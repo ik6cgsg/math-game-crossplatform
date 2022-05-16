@@ -89,7 +89,7 @@ class _PlayScreenState extends State<PlayScreen> {
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.repeat_rounded),
+          icon: const Icon(Icons.refresh_rounded),
           color: Theme.of(context).backgroundColor,
           tooltip: 'Перезапуск уровня',
           onPressed: int.tryParse(index) == null ? null : () {
@@ -187,7 +187,7 @@ class _PlayScreenState extends State<PlayScreen> {
           const SizedBox(width: 30,),
           FloatingActionButton.extended(
             heroTag: 'reload',
-            label: const Icon(Icons.repeat_rounded),
+            label: const Icon(Icons.refresh_rounded),
             tooltip: 'Перезапуск уровня',
             onPressed: () {
               di<RemoteRepository>().logEvent(StatisticActionRestart(bloc.levelCode, bloc.levelIndex));

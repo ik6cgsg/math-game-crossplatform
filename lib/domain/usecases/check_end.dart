@@ -1,69 +1,47 @@
 import 'package:dartz/dartz.dart' hide Task;
 import 'package:equatable/equatable.dart';
 import 'package:math_game_crossplatform/core/failures.dart';
-import 'package:math_game_crossplatform/data/models/stat_models.dart';
 import 'package:math_game_crossplatform/domain/entities/platform_entities.dart';
 import 'package:math_game_crossplatform/domain/entities/result.dart';
-import 'package:math_game_crossplatform/domain/repositories/asset_repository.dart';
+import 'package:math_game_crossplatform/domain/entities/step_state.dart';
 import 'package:math_game_crossplatform/domain/repositories/local_repository.dart';
 import 'package:math_game_crossplatform/domain/repositories/platform_repository.dart';
-import 'package:math_game_crossplatform/domain/repositories/remote_repository.dart';
 
 import '../../core/usecase.dart';
 
-class CheckEnd implements UseCase<PassedData, Params> {
-  final AssetRepository assetRepository;
+class CheckEnd implements UseCase<bool, Params> {
   final PlatformRepository platformRepository;
   final LocalRepository localRepository;
-  final RemoteRepository remoteRepository;
 
-  CheckEnd(this.assetRepository, this.platformRepository, this.localRepository, this.remoteRepository);
+  CheckEnd(this.platformRepository, this.localRepository);
 
   @override
-  Future<Either<Failure, PassedData>> call(Params params) async {
-    final len = assetRepository.tasksCount;
-    if (len == 0) return Left(InternalFailure());
-    if (params.ignoreCheck) {
-      remoteRepository.logEvent(StatisticActionLevelEnd(params.levelCode, true, params.stepCount));
-      return Right(PassedData(true, params.levelIndex > 0, params.levelIndex < len! - 1));
-    }
+  Future<Either<Failure, bool>> call(Params params) async {
     final res = await platformRepository.checkEnd(
-      CheckEndInput(params.currentExpression, params.goalExpression, params.goalPattern)
+      CheckEndInput(params.currentStep.currentExpression, params.goalExpression, params.goalPattern)
     );
     return res.fold(
       (fail) => Left(fail),
       (passed) {
         if (passed) {
-          remoteRepository.logEvent(StatisticActionLevelEnd(params.levelCode, true, params.stepCount));
-          localRepository.saveLevelResult(Result(params.levelCode, params.currentExpression, params.stepCount, LevelState.passed));
-          return Right(PassedData(true, params.levelIndex > 0, params.levelIndex < len! - 1));
+          localRepository.saveLevelResult(Result(params.levelCode, params.currentStep.currentExpression,
+              params.currentStep.stepCount, LevelState.passed));
+          return const Right(true);
         }
-        return const Right(PassedData(false, null, null));
+        return const Right(false);
       }
     );
   }
 }
 
 class Params extends Equatable {
-  final int levelIndex;
   final String levelCode;
-  final String currentExpression, goalExpression, goalPattern;
-  final int stepCount;
-  final bool ignoreCheck;
+  final String goalExpression, goalPattern;
+  final StepState currentStep;
 
-  const Params(this.levelIndex, this.levelCode, this.currentExpression, this.goalExpression, this.goalPattern, this.stepCount,
-    {this.ignoreCheck = false});
+  const Params(this.levelCode, this.goalExpression, this.goalPattern, this.currentStep);
 
   @override
-  List<Object?> get props => [levelIndex, levelCode, currentExpression, goalExpression, goalPattern, stepCount, ignoreCheck];
+  List<Object?> get props => [levelCode, goalExpression, goalPattern, currentStep];
 }
 
-class PassedData extends Equatable {
-  final bool passed;
-  final bool? hasPrev, hasNext;
-
-  const PassedData(this.passed, this.hasPrev, this.hasNext);
-
-  @override
-  List<Object?> get props => [passed, hasPrev, hasNext];
-}
