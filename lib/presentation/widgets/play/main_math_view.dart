@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide Step;
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:math_game_crossplatform/core/logger.dart';
+import 'package:math_game_crossplatform/data/models/platform_models.dart';
 import 'package:math_game_crossplatform/main.dart';
 import 'package:math_game_crossplatform/presentation/blocs/play/play_bloc.dart';
 import 'package:math_game_crossplatform/presentation/blocs/play/play_event.dart';
@@ -26,14 +26,17 @@ class _MainMathViewState extends State<MainMathView> {
 
   @override
   Widget build(BuildContext context) {
-    final playState = BlocProvider.of<PlayBloc>(context, listen: true).state;
+    final playBloc = BlocProvider.of<PlayBloc>(context, listen: true);
+    final playState = playBloc.state;
     return BlocProvider(
       create: (_) => di<ResolverBloc>(),
       child: BlocBuilder<ResolverBloc, ResolverState>(builder: (context, state) {
         if (playState is Step) {
           if (_currentExpression != playState.state.currentExpression) {
             _currentExpression = playState.state.currentExpression;
-            BlocProvider.of<ResolverBloc>(context).add(Resolve(_currentExpression, true, true));
+            BlocProvider.of<ResolverBloc>(context).add(Resolve(
+              ResolutionInput(_currentExpression, playBloc.subjectType, true, true)
+            ));
           }
           if (state is Resolving) return _loadingBody(context);
           if (state is Resolved) return _resolvedBody(context, state.matrix, playState);

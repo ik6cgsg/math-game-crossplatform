@@ -7,14 +7,14 @@ class FullTasksetModel extends FullTaskset {
   const FullTasksetModel(TasksetModel taskset, List<RulePackageModel> rulePacks): super(taskset, rulePacks);
 
   factory FullTasksetModel.fromJson(Map<String, dynamic> json) => FullTasksetModel(
-    TasksetModel.fromJson(json['taskset'] as Map<String, dynamic>),
+    TasksetModel.fromJson(json['taskSet'] as Map<String, dynamic>),
     (json['rulePacks'] as List<dynamic>)
         .map((e) => RulePackageModel.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-    'taskset': taskset,
+    'taskSet': taskset,
     'rulePacks': rulePacks,
   };
 

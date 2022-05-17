@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:math_game_crossplatform/data/models/platform_models.dart';
 
 import 'package:math_game_crossplatform/main.dart';
+import 'package:math_game_crossplatform/presentation/blocs/play/play_bloc.dart';
 import 'package:math_game_crossplatform/presentation/blocs/resolver/resolver_bloc.dart';
 import 'package:math_game_crossplatform/presentation/blocs/resolver/resolver_event.dart';
 import 'package:math_game_crossplatform/presentation/blocs/resolver/resolver_state.dart';
@@ -17,7 +19,9 @@ class RuleMathView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => di<ResolverBloc>()..add(Resolve(expression, true, false)),
+      create: (_) => di<ResolverBloc>()..add(
+        Resolve(ResolutionInput(expression, BlocProvider.of<PlayBloc>(context).subjectType, true, false))
+      ),
       child: BlocBuilder<ResolverBloc, ResolverState>(builder: (context, state) {
         if (state is Resolving) return _loadingBody(context);
         if (state is Resolved) return _resolvedBody(state.matrix);

@@ -14,7 +14,7 @@ class PlatformRepositoryImpl implements PlatformRepository {
   @override
   Future<Either<Failure, String>> resolveExpression(ResolutionInput input) async {
     try {
-      return Right(await platformDataSource.resolveExpression(ResolutionInputModel.fromEntity(input)));
+      return Right(await platformDataSource.resolveExpression(input));
     } catch(_) {
       return Left(PlatformFailure());
     }
@@ -41,7 +41,7 @@ class PlatformRepositoryImpl implements PlatformRepository {
   @override
   Future<Either<Failure, bool>> checkEnd(CheckEndInput input) async {
     try {
-      return Right(await platformDataSource.checkEnd(CheckEndInputModel.fromEntity(input)));
+      return Right(await platformDataSource.checkEnd(input));
     } catch(_) {
       return Left(PlatformFailure());
     }

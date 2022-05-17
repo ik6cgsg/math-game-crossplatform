@@ -8,8 +8,8 @@ abstract class AssetDataSource {
   Future<FullTasksetModel> getFullTaskset();
 }
 
-const kGamePath = 'assets/game/game.json';
-const kSettingsPath = 'assets/game/settings.json';
+const kGamePath = 'assets/game/game_test.json';
+const kSettingsPath = 'assets/game/settings_test.json';
 
 class BadSettings extends AssetFailure {}
 

@@ -6,26 +6,25 @@ import '../models/platform_models.dart';
 import '../models/rule_model.dart';
 
 abstract class PlatformDataSource {
-  Future<void> compileConfiguration(Set<RuleModel> rules);
-  Future<String> resolveExpression(ResolutionInputModel input);
+  Future<void> compileConfiguration(CompileInput input);
+  Future<String> resolveExpression(ResolutionInput input);
   Future<NodeSelectionInfoModel> getNodeByTouch(PointModel tap);
   Future<SubstitutionInfoModel> getSubstitutionInfo(List<int> nodeIds);
-  Future<bool> checkEnd(CheckEndInputModel input);
+  Future<bool> checkEnd(CheckEndInput input);
 }
 
 const MethodChannel kChannel = MethodChannel('mathhelper.games.crossplatform/math_util');
 
 class PlatformDataSourceImpl implements PlatformDataSource {
   @override
-  Future<void> compileConfiguration(Set<RuleModel> rules) async {
-    log.info('compileConfiguration(); size == ${rules.length}');
-    await kChannel.invokeMethod('compileConfiguration', <String, dynamic>{
-      'rules': rules.map((e) => e.toJson()).toList()
-    });
+  Future<void> compileConfiguration(CompileInput input) async {
+    log.info('compileConfiguration(); size == ${input.rules.length}');
+    log.info('compileConfiguration(); additional params == ${input.additionalParams}');
+    await kChannel.invokeMethod('compileConfiguration', input.toJson());
   }
 
   @override
-  Future<String> resolveExpression(ResolutionInputModel input) async {
+  Future<String> resolveExpression(ResolutionInput input) async {
     log.info('resolveExpression($input)');
     final res = await kChannel.invokeMethod<String>('resolveExpression', input.toJson());
     if (res == null) throw LocalPlatformException();
@@ -53,7 +52,7 @@ class PlatformDataSourceImpl implements PlatformDataSource {
   }
 
   @override
-  Future<bool> checkEnd(CheckEndInputModel input) async {
+  Future<bool> checkEnd(CheckEndInput input) async {
     log.info('checkEnd($input)');
     final res = await kChannel.invokeMethod<bool>('checkEnd', input.toJson());
     if (res == null) throw LocalPlatformException();

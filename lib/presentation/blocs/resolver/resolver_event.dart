@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:math_game_crossplatform/data/models/platform_models.dart';
 
 abstract class ResolverEvent extends Equatable {
   @override
@@ -6,11 +7,10 @@ abstract class ResolverEvent extends Equatable {
 }
 
 class Resolve extends ResolverEvent {
-  final String expression;
-  final bool isStructured, isInteractive;
+  final ResolutionInput input;
 
-  Resolve(this.expression, this.isStructured, this.isInteractive);
+  Resolve(this.input);
 
   @override
-  List<Object> get props => [expression, isStructured, isInteractive];
+  List<Object> get props => [input];
 }

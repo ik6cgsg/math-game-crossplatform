@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart' hide Task;
 import 'package:flutter/services.dart';
 import 'package:math_game_crossplatform/core/failures.dart';
+import 'package:math_game_crossplatform/core/logger.dart';
 import 'package:math_game_crossplatform/data/datasources/asset_data_source.dart';
 import 'package:math_game_crossplatform/data/datasources/platform_data_source.dart';
+import 'package:math_game_crossplatform/data/models/platform_models.dart';
 import 'package:math_game_crossplatform/domain/entities/taskset.dart';
 import 'package:math_game_crossplatform/domain/entities/task.dart';
 import 'package:math_game_crossplatform/domain/repositories/asset_repository.dart';
@@ -27,7 +29,8 @@ class AssetRepositoryImpl implements AssetRepository {
         return Left(AssetFailure());
       }
       return Right(_fullTaskset!.taskset);
-    } catch(_) {
+    } catch(e) {
+      log.info('AssetRepositoryImpl: loadFullTaskset failed with $e');
       return Left(AssetFailure());
     }
   }
@@ -39,11 +42,16 @@ class AssetRepositoryImpl implements AssetRepository {
     }
     try {
       final task = _fullTaskset!.taskset.tasks[i] as TaskModel;
-      await platformDataSource.compileConfiguration(task.getAllRules(_fullTaskset!.getAllPacksMap()));
+      await platformDataSource.compileConfiguration(CompileInput(
+        task.getAllRules(_fullTaskset!.getAllPacksMap()),
+        task.otherCheckSolutionData as Map<String, String>? ?? {}
+      ));
       return Right(task);
     } on PlatformException {
+      log.info('AssetRepositoryImpl: loadTask failed to platform compile level');
       return Left(PlatformFailure());
-    } catch(_) {
+    } catch(e) {
+      log.info('AssetRepositoryImpl: loadTask failed with $e');
       return Left(AssetFailure());
     }
   }

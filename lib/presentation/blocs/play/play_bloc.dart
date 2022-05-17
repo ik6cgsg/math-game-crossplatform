@@ -37,6 +37,7 @@ class PlayBloc extends Bloc<PlayEvent, PlayState> {
   String get goalExpression => _task.goalExpressionStructureString ?? '';
   String get goalPattern => _task.goalPattern ?? '';
   String get shortDescription => _task.descriptionShortRu;
+  String get subjectType => _task.subjectType;
   bool get canUndo => _history.length > 1;
 
   PlayBloc(

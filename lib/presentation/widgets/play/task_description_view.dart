@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Step;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:math_game_crossplatform/data/models/platform_models.dart';
 import 'package:math_game_crossplatform/presentation/blocs/play/play_state.dart' hide Error;
 import 'package:math_game_crossplatform/presentation/blocs/resolver/resolver_bloc.dart';
 import 'package:math_game_crossplatform/presentation/blocs/resolver/resolver_event.dart';
@@ -18,7 +19,9 @@ class TaskDescriptionView extends StatelessWidget {
       return _resolvedBody(context, '', bloc.shortDescription);
     }
     return BlocProvider(
-      create: (_) => di<ResolverBloc>()..add(Resolve(bloc.goalExpression, true, false)),
+      create: (_) => di<ResolverBloc>()..add(Resolve(
+        ResolutionInput(bloc.goalExpression, bloc.subjectType, true, false)
+      )),
       child: BlocBuilder<ResolverBloc, ResolverState>(builder: (context, state) {
         if (state is Resolving) return _resolvedBody(context, '', bloc.shortDescription);
         if (state is Resolved) return _resolvedBody(context, state.matrix, bloc.shortDescription);

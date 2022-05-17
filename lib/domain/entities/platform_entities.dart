@@ -23,16 +23,6 @@ class SelectionBox extends Equatable {
   List<Object> get props => [lt, rb];
 }
 
-class ResolutionInput extends Equatable {
-  final String expressionStr;
-  final bool isStructured, isInteractive;
-
-  const ResolutionInput(this.expressionStr, this.isStructured, this.isInteractive);
-
-  @override
-  List<Object> get props => [expressionStr, isStructured, isInteractive];
-}
-
 class NodeSelectionInfo extends Equatable {
   final String expression;
   final int nodeId;
@@ -52,13 +42,4 @@ class SubstitutionInfo extends Equatable {
 
   @override
   List<Object> get props => [rules, results];
-}
-
-class CheckEndInput extends Equatable {
-  final String expression, goalExpression, goalPattern;
-
-  const CheckEndInput(this.expression, this.goalExpression, this.goalPattern);
-
-  @override
-  List<Object> get props => [expression, goalExpression, goalPattern];
 }

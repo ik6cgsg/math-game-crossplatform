@@ -1,3 +1,6 @@
+import 'package:equatable/equatable.dart';
+import 'package:math_game_crossplatform/data/models/rule_model.dart';
+
 import '../../domain/entities/platform_entities.dart';
 
 class PointModel extends Point {
@@ -11,20 +14,6 @@ class PointModel extends Point {
   factory PointModel.fromEntity(Point p) => PointModel(p.x, p.y);
 }
 
-class ResolutionInputModel extends ResolutionInput {
-  const ResolutionInputModel(String expressionStr, bool isStructured, bool isInteractive)
-      : super(expressionStr, isStructured, isInteractive);
-
-  Map<String, dynamic> toJson() => <String, dynamic>{
-    'expression': expressionStr,
-    'structured': isStructured,
-    'interactive': isInteractive
-  };
-
-  factory ResolutionInputModel.fromEntity(ResolutionInput ri) => ResolutionInputModel(
-      ri.expressionStr, ri.isStructured, ri.isInteractive);
-}
-
 class NodeSelectionInfoModel extends NodeSelectionInfo {
   NodeSelectionInfoModel(String expression, int nodeId, PointModel lt, PointModel rb)
       : super(expression, nodeId, SelectionBox(lt, rb));
@@ -35,12 +24,6 @@ class NodeSelectionInfoModel extends NodeSelectionInfo {
     PointModel.fromList(List<int>.from(json['lt'])),
     PointModel.fromList(List<int>.from(json['rb'])),
   );
-
-  factory NodeSelectionInfoModel.fromEntity(NodeSelectionInfo nsi) => NodeSelectionInfoModel(
-    nsi.expression, nsi.nodeId,
-    PointModel.fromEntity(nsi.selection.lt),
-    PointModel.fromEntity(nsi.selection.rb)
-  );
 }
 
 class SubstitutionInfoModel extends SubstitutionInfo {
@@ -50,23 +33,53 @@ class SubstitutionInfoModel extends SubstitutionInfo {
       List<String>.from(json['rules']),
       List<String>.from(json['results'])
   );
-
-  factory SubstitutionInfoModel.fromEntity(SubstitutionInfo si) => SubstitutionInfoModel(
-    si.rules, si.results
-  );
 }
 
-class CheckEndInputModel extends CheckEndInput {
-  const CheckEndInputModel(String expression, String goalExpression, String goalPattern)
-      : super(expression, goalExpression, goalPattern);
+/// Input data */
+
+class CheckEndInput extends Equatable {
+  final String expression, goalExpression, goalPattern;
+
+  const CheckEndInput(this.expression, this.goalExpression, this.goalPattern);
+
+  @override
+  List<Object> get props => [expression, goalExpression, goalPattern];
 
   Map<String, dynamic> toJson() => <String, dynamic>{
     'expression': expression,
     'goal': goalExpression,
     'pattern': goalPattern
   };
+}
 
-  factory CheckEndInputModel.fromEntity(CheckEndInput cei) => CheckEndInputModel(
-    cei.expression, cei.goalExpression, cei.goalPattern
-  );
+class ResolutionInput extends Equatable {
+  final String expressionStr, subjectType;
+  final bool isStructured, isInteractive;
+
+  const ResolutionInput(this.expressionStr, this.subjectType, this.isStructured, this.isInteractive);
+
+  @override
+  List<Object> get props => [expressionStr, subjectType, isStructured, isInteractive];
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'expression': expressionStr,
+    'subject': subjectType,
+    'structured': isStructured,
+    'interactive': isInteractive
+  };
+}
+
+class CompileInput extends Equatable {
+  final Set<RuleModel> rules;
+  final Map<String, String> additionalParams;
+
+  const CompileInput(this.rules, this.additionalParams);
+
+  @override
+  List<Object> get props => [rules, additionalParams];
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'rules': rules.map((e) => e.toJson()).toList(),
+    'additional': additionalParams
+  };
 }

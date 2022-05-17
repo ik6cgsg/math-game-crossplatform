@@ -13,11 +13,13 @@ import mathhelper.twf.expressiontree.ExpressionSubstitutionNormType
 import mathhelper.utility.math_resolver_lib.MathResolver
 import mathhelper.utility.math_resolver_lib.MathResolverPair
 import mathhelper.utility.math_resolver_lib.OperationType
+import mathhelper.utility.math_resolver_lib.TaskType
 
 class MainActivity: FlutterActivity() {
     private val CHANNEL = "mathhelper.games.crossplatform/math_util"
     private var currentExpressionPair: MathResolverPair? = null
     private var compiledConfiguration: CompiledConfiguration? = null
+    private var taskSubject: String? = null
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -35,10 +37,12 @@ class MainActivity: FlutterActivity() {
 
     private fun resolveExpression(call: MethodCall, res: MethodChannel.Result) {
         val expression = call.argument<String>("expression")
+        taskSubject = call.argument<String>("subject")
+        val taskType = if (taskSubject == "setTheory" || taskSubject == "set") TaskType.SET else TaskType.DEFAULT
         val structured = call.argument<Boolean>("structured") ?: true
         val interactive = call.argument<Boolean>("interactive") ?: false
         if (expression != null) {
-            val pair = MathResolver.resolveToPlain(expression, structureString = structured)
+            val pair = MathResolver.resolveToPlain(expression, structureString = structured, taskType = taskType)
             if (interactive) {
                 currentExpressionPair = pair
             }
@@ -107,6 +111,7 @@ class MainActivity: FlutterActivity() {
 
     private fun compileConfiguration(call: MethodCall, res: MethodChannel.Result) {
         val rules = call.argument<List<Map<String, *>>>("rules")
+        val additional = call.argument<Map<String, String>>("additional")
         val subs = arrayListOf<ExpressionSubstitution>()
         for (rule in rules ?: listOf()) {
             val normType = when (rule["normalizationType"] as String) {
@@ -131,7 +136,7 @@ class MainActivity: FlutterActivity() {
             subs.add(substitution)
         }
         compiledConfiguration = createCompiledConfigurationFromExpressionSubstitutionsAndParams(
-            subs.toTypedArray())
+            subs.toTypedArray(), additional ?: mapOf())
         res.success(null)
     }
 
@@ -142,8 +147,8 @@ class MainActivity: FlutterActivity() {
         if (pattern.isBlank()) {
             res.success(expression == goal)
         } else {
-            val ex = structureStringToExpression(expression)
-            val pat = stringToExpressionStructurePattern(pattern)
+            val ex = structureStringToExpression(expression, scope = taskSubject ?: "")
+            val pat = stringToExpressionStructurePattern(pattern, scope = taskSubject ?: "")
             res.success(compareByPattern(ex, pat))
         }
     }

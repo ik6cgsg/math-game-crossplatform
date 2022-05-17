@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart' hide Task;
 import 'package:equatable/equatable.dart';
 import 'package:math_game_crossplatform/core/failures.dart';
-import 'package:math_game_crossplatform/domain/entities/platform_entities.dart';
+import 'package:math_game_crossplatform/data/models/platform_models.dart';
 import 'package:math_game_crossplatform/domain/entities/result.dart';
 import 'package:math_game_crossplatform/domain/entities/step_state.dart';
 import 'package:math_game_crossplatform/domain/repositories/local_repository.dart';
