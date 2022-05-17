@@ -44,7 +44,7 @@ class AssetRepositoryImpl implements AssetRepository {
       final task = _fullTaskset!.taskset.tasks[i] as TaskModel;
       await platformDataSource.compileConfiguration(CompileInput(
         task.getAllRules(_fullTaskset!.getAllPacksMap()),
-        task.otherCheckSolutionData as Map<String, String>? ?? {}
+        (task.otherCheckSolutionData as Map<String, dynamic>?)?.map((key, value) => MapEntry(key, value as String? ?? '')) ?? {}
       ));
       return Right(task);
     } on PlatformException {

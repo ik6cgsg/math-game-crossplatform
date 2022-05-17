@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:math_game_crossplatform/core/failures.dart';
-import 'package:math_game_crossplatform/data/models/task_model.dart';
 import 'package:math_game_crossplatform/data/models/taskset_model.dart';
 
 abstract class AssetDataSource {
   Future<FullTasksetModel> getFullTaskset();
 }
 
-const kGamePath = 'assets/game/game_test.json';
-const kSettingsPath = 'assets/game/settings_test.json';
+const kGamePath = 'assets/game/game.json';
+const kSettingsPath = 'assets/game/settings.json';
 
 class BadSettings extends AssetFailure {}
 

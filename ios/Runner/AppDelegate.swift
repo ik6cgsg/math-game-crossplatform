@@ -8,6 +8,7 @@ import FirebaseCore
     let CHANNEL = "mathhelper.games.crossplatform/math_util"
     var currentExpressionPair: MathResolverPair?
     var compiledConfiguration: CompiledConfiguration?
+    var taskSubject: String?
     
     override func application(
         _ application: UIApplication,
@@ -33,12 +34,16 @@ import FirebaseCore
     private func resolveExpression(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let args = call.arguments as? [String: Any]
         let expression = args?["expression"] as? String
+        taskSubject = args?["subject"] as? String
+        var taskType = TaskType.default_
+        if taskSubject == "setTheory" || taskSubject == "set" {
+            taskType = TaskType.set
+        }
         let structured = args?["structured"] as? Bool
         let interactive = args?["interactive"] as? Bool ?? false
         if let ex = expression, let st = structured {
-            let map = KotlinMutableDictionary<OperationType, NSString>(dictionary: [OperationType.div: "—"])
             let pair = MathResolver.companion.resolveToPlain(expression: ex, style: .default_,
-                taskType: .default_, structureString: st, customSymbolMap: map)
+                taskType: taskType, structureString: st, customSymbolMap: nil)
             if (interactive) {
                 self.currentExpressionPair = pair
             }
@@ -106,6 +111,7 @@ import FirebaseCore
     private func compileConfiguration(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
         let args = call.arguments as? [String: Any]
         let rules = args?["rules"] as? [[String: Any]]
+        let additional = args?["additional"] as? [String: String] ?? [:]
         var subs = [ExpressionSubstitution]()
         for rule in rules ?? [] {
             var normType = ExpressionSubstitutionNormType.original
@@ -142,7 +148,7 @@ import FirebaseCore
         })
         compiledConfiguration = ExpressionSubstitutionsAPIKt.createCompiledConfigurationFromExpressionSubstitutionsAndParams(
             expressionSubstitutions: array,
-            additionalParamsMap: [:]
+            additionalParamsMap: additional
         )
         result(nil)
     }
@@ -154,9 +160,16 @@ import FirebaseCore
                 result(expression == goal)
             } else {
                 let base = FunctionConfiguration(scopeFilter: [], notChangesOnVariablesInComparisonFunctionFilter: [])
-                let ex = ExpressionParserAPIKt.structureStringToExpression(structureString: expression, scope: "",
-                    functionConfiguration: base)
-                let pat = ExpressionParserAPIKt.stringToExpressionStructurePattern(string: pattern, scope: "", functionConfiguration: base)
+                let ex = ExpressionParserAPIKt.structureStringToExpression(
+                    structureString: expression,
+                    scope: taskSubject ?? "",
+                    functionConfiguration: base
+                )
+                let pat = ExpressionParserAPIKt.stringToExpressionStructurePattern(
+                    string: pattern,
+                    scope: taskSubject ?? "",
+                    functionConfiguration: base
+                )
                 result(ExpressionComparisonsAPIKt.compareByPattern(expression: ex, pattern: pat))
             }
         } else {

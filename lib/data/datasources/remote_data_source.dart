@@ -9,10 +9,10 @@ abstract class RemoteDataSource {
 class RemoteDataSourceFirebase implements RemoteDataSource {
   @override
   Future<void> logEvent(StatisticAction action) async {
-    /*await FirebaseAnalytics.instance.logEvent(
+    await FirebaseAnalytics.instance.logEvent(
       name: action.name,
       parameters: action.toMap(),
-    );*/
+    );
     log.info('RemoteDataSourceFirebase: event ${action.name} logged successfully');
   }
 }

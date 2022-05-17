@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:math_game_crossplatform/presentation/blocs/play/play_bloc.dart';
@@ -13,6 +15,9 @@ class MathInteractionView extends StatefulWidget {
 }
 
 class _MathInteractionViewState extends State<MathInteractionView> {
+  static const double _maxScale = 10;
+  static const double _minScale = 0.3;
+
   Offset _offset = Offset.zero;
   Offset _initialFocalPoint = Offset.zero;
   Offset _sessionOffset = Offset.zero;
@@ -49,10 +54,14 @@ class _MathInteractionViewState extends State<MathInteractionView> {
           _initialScale = _scale;
         },
         onScaleUpdate: (details) {
-          setState(() {
-            _sessionOffset = details.focalPoint - _initialFocalPoint;
-            _scale = _initialScale * details.scale;
-          });
+          _sessionOffset = details.focalPoint - _initialFocalPoint;
+          _scale = _initialScale * details.scale;
+          if (_scale < _minScale) {
+            _scale = _minScale;
+          } else if (_scale > _maxScale) {
+            _scale = _maxScale;
+          }
+          setState(() {});
         },
         onScaleEnd: (details) {
           setState(() {

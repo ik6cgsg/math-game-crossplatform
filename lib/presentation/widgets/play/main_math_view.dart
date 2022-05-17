@@ -138,7 +138,7 @@ class _MainMathViewState extends State<MainMathView> {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       width: MediaQuery.of(context).size.width,
       alignment: Alignment.center,
-      child: Text(
+      child: SelectableText(
         error,
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.headline2

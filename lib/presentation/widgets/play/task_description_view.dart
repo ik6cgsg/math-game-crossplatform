@@ -79,7 +79,7 @@ class TaskDescriptionView extends StatelessWidget {
       child: Container(
         width: double.infinity,
         alignment: Alignment.center,
-        child: Text(
+        child: SelectableText(
           error,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headline2
