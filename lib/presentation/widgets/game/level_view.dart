@@ -28,7 +28,7 @@ class LevelView extends StatelessWidget {
             opacity: 0.2,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
-              child: Image.asset('assets/images/back.jpeg',
+              child: Image.asset('assets/images/back.png',
                 fit: BoxFit.fill,
               ),
             ),
