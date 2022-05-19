@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,10 +28,12 @@ class PlayScreen extends StatefulWidget {
 }
 
 class _PlayScreenState extends State<PlayScreen> {
+  late ConfettiController _controllerBottomCenter;
 
   @override
   void initState() {
     super.initState();
+    _controllerBottomCenter = ConfettiController(duration: const Duration(seconds: 2));
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     di<RemoteRepository>().logEvent(const StatisticActionScreenOpen('PlayScreen'));
   }
@@ -52,16 +57,7 @@ class _PlayScreenState extends State<PlayScreen> {
             child: state is Loading ?
               _loadingBody(context) :
             state is Passed ?
-              PassedView((rate) {
-                di<RemoteRepository>().logEvent(StatisticActionLevelRate(BlocProvider.of<PlayBloc>(context).levelCode, rate));
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: const Text('Оценка отправлена, спасибо!'),
-                  action: SnackBarAction(label: '👌', onPressed: () {
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  }),
-                ));
-              }) :
+              _passedBody(context) :
             state is Error ?
               _errorBody(context, state.message) :
             MediaQuery.of(context).orientation == Orientation.portrait ?
@@ -97,7 +93,14 @@ class _PlayScreenState extends State<PlayScreen> {
             playBloc.add(RestartEvent());
           },
         ),
-        IconButton(
+        playBloc.state is Passed ? IconButton(
+          icon: const Icon(Icons.celebration_rounded),
+          color: Theme.of(context).backgroundColor,
+          tooltip: 'Поздравляю!',
+          onPressed: () {
+            _controllerBottomCenter.play();
+          },
+        ) : IconButton(
           icon: const Icon(Icons.undo_rounded),
           color: Theme.of(context).backgroundColor,
           tooltip: 'Отмена действия',
@@ -168,6 +171,34 @@ class _PlayScreenState extends State<PlayScreen> {
         ]
       );
     });
+  }
+
+  Widget _passedBody(BuildContext context) {
+    _controllerBottomCenter.play();
+    return Stack(
+      children: [
+        Align(
+          alignment: Alignment.topCenter,
+          child: ConfettiWidget(
+            canvas: MediaQuery.of(context).size,
+            confettiController: _controllerBottomCenter,
+            blastDirectionality: BlastDirectionality.explosive,
+            emissionFrequency: 0.05,
+            numberOfParticles: 20,
+          ),
+        ),
+        PassedView((rate) {
+          di<RemoteRepository>().logEvent(StatisticActionLevelRate(BlocProvider.of<PlayBloc>(context).levelCode, rate));
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: const Text('Оценка отправлена, спасибо!'),
+            action: SnackBarAction(label: '👌', onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            }),
+          ));
+        }),
+      ]
+    );
   }
 
   Widget _passedActions(BuildContext context, Passed info) {

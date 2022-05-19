@@ -1,5 +1,11 @@
+import 'dart:math' hide log;
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:math_game_crossplatform/main.dart';
+
+import '../../../core/logger.dart';
+import '../../blocs/play/play_bloc.dart';
 
 class PassedView extends StatefulWidget {
   final void Function(int) onTap;
@@ -40,12 +46,13 @@ class _PassedViewState extends State<PassedView> {
                 children: [
                   _emojiButton(context, '😭️', 1),
                   _emojiButton(context, '🙁', 2),
-                  _emojiButton(context, '🤨', 3),
+                  _emojiButton(context, '😐', 3),
                   _emojiButton(context, '🙂', 4),
                   _emojiButton(context, '😊', 5),
                 ],
               ),
-            )
+            ),
+            const SizedBox(height: 10,),
           ],
         ),
       ),
