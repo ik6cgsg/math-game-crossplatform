@@ -1,4 +1,4 @@
-package mathhelper.games.math_game_crossplatform
+package mathhelper.games.substify_logic
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity

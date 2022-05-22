@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAsroDX86kNW04aXpAuv2VwKSYldGfn91w',
-    appId: '1:688165065706:android:7975f27907b7115f3f9893',
+    appId: '1:688165065706:android:8b20e91c769008653f9893',
     messagingSenderId: '688165065706',
     projectId: 'mathhelper-community',
     databaseURL: 'https://mathhelper-community.firebaseio.com',
@@ -60,12 +60,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCKO3cw32V5-VO67fU4c9KCOlaQ1Vb5-nU',
-    appId: '1:688165065706:ios:2e1e6169b3524b123f9893',
+    appId: '1:688165065706:ios:7a54234c966167a33f9893',
     messagingSenderId: '688165065706',
     projectId: 'mathhelper-community',
     databaseURL: 'https://mathhelper-community.firebaseio.com',
     storageBucket: 'mathhelper-community.appspot.com',
-    iosClientId: '688165065706-21245ckakam9fjamn2k90veu9qs782ab.apps.googleusercontent.com',
-    iosBundleId: 'mathhelper.games.mathGameCrossplatform',
+    iosClientId: '688165065706-50su77fg67toqcn2ga3od4245uik6si3.apps.googleusercontent.com',
+    iosBundleId: 'mathhelper.games.substify-logic',
   );
 }

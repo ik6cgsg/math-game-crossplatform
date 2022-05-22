@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:688165065706:android:7975f27907b7115f3f9893",
+        "mobilesdk_app_id": "1:688165065706:android:8b20e91c769008653f9893",
         "android_client_info": {
-          "package_name": "mathhelper.games.math_game_crossplatform"
+          "package_name": "mathhelper.games.substify_logic"
         }
       },
       "oauth_client": [
@@ -30,6 +30,13 @@
             {
               "client_id": "688165065706-o5gdq58fljbkgvg9e3lo1badaq3i9dsr.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "688165065706-21245ckakam9fjamn2k90veu9qs782ab.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "mathhelper.games.mathGameCrossplatform"
+              }
             }
           ]
         }
@@ -59,6 +66,13 @@
             {
               "client_id": "688165065706-o5gdq58fljbkgvg9e3lo1badaq3i9dsr.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "688165065706-21245ckakam9fjamn2k90veu9qs782ab.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "mathhelper.games.mathGameCrossplatform"
+              }
             }
           ]
         }
