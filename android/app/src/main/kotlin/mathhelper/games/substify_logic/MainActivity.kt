@@ -42,7 +42,8 @@ class MainActivity: FlutterActivity() {
         val structured = call.argument<Boolean>("structured") ?: true
         val interactive = call.argument<Boolean>("interactive") ?: false
         if (expression != null) {
-            val pair = MathResolver.resolveToPlain(expression, structureString = structured, taskType = taskType)
+            val pair = MathResolver.resolveToPlain(expression,
+                structureString = structured, taskType = taskType, shrink = !interactive)
             if (interactive) {
                 currentExpressionPair = pair
             }

@@ -19,12 +19,14 @@ class AssetDataSourceImpl implements AssetDataSource {
     final order = Settings.fromJson(jsonDecode(json)).orderedTaskCodes;
     json = await rootBundle.loadString(kGamePath);
     final fullTaskset = FullTasksetModel.fromJson(jsonDecode(json));
-    fullTaskset.taskset.tasks.sort((t1, t2) {
-      final i1 = order.indexOf(t1.code);
-      final i2 = order.indexOf(t2.code);
-      if (i1 < 0 || i2 < 0) throw BadSettings();
-      return i1.compareTo(i2);
-    });
+    if (order.isNotEmpty) {
+      fullTaskset.taskset.tasks.sort((t1, t2) {
+        final i1 = order.indexOf(t1.code);
+        final i2 = order.indexOf(t2.code);
+        if (i1 < 0 || i2 < 0) throw BadSettings();
+        return i1.compareTo(i2);
+      });
+    }
     return Future.value(fullTaskset);
   }
 }

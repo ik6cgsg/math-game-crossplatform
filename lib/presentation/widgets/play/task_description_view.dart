@@ -14,40 +14,47 @@ class TaskDescriptionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<PlayBloc>(context);
-    if (bloc.goalExpression.isEmpty) {
-      return _resolvedBody(context, '', bloc.shortDescription);
-    }
-    return BlocProvider(
-      create: (_) => di<ResolverBloc>()..add(Resolve(
-        ResolutionInput(bloc.goalExpression, bloc.subjectType, true, false)
-      )),
-      child: BlocBuilder<ResolverBloc, ResolverState>(builder: (context, state) {
-        if (state is Resolving) return _resolvedBody(context, '', bloc.shortDescription);
-        if (state is Resolved) return _resolvedBody(context, state.matrix, bloc.shortDescription);
-        return _errorBody(context, (state as Error).message);
-      })
-    );
+    return LayoutBuilder(builder: (context, constrains) {
+      final bloc = BlocProvider.of<PlayBloc>(context);
+      if (bloc.goalExpression.isEmpty) {
+        return _resolvedBody(context, '', bloc.shortDescription, constrains.maxWidth);
+      }
+      return BlocProvider(
+          create: (_) => di<ResolverBloc>()..add(Resolve(
+              ResolutionInput(bloc.goalExpression, bloc.subjectType, true, false)
+          )),
+          child: BlocBuilder<ResolverBloc, ResolverState>(builder: (context, state) {
+            if (state is Resolving) return _resolvedBody(context, '', bloc.shortDescription, constrains.maxWidth);
+            if (state is Resolved) return _resolvedBody(context, state.matrix, bloc.shortDescription, constrains.maxWidth);
+            return _errorBody(context, (state as Error).message);
+          })
+      );
+    });
   }
 
-  Widget _resolvedBody(BuildContext context, String output, String desc) {
+  Widget _resolvedBody(BuildContext context, String output, String desc, double maxW) {
     return Card(
       color: Theme.of(context).primaryColor.withAlpha(20),
       margin: const EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 5),
       child: MediaQuery.of(context).orientation == Orientation.portrait ?
       Container(
-        width: double.infinity,
+        width: maxW,
         alignment: Alignment.center,
         child: Column(
           children: _children(context, desc, output)
         ),
       ) :
       Container(
-        width: double.infinity,
+        width: maxW,
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: _children(context, desc, output),
+        child: Center(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: _children(context, desc, output),
+            ),
+          ),
         ),
       ),
     );

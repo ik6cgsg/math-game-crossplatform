@@ -20,7 +20,8 @@ class LevelView extends StatelessWidget {
               style: Theme.of(context).textTheme.headline1,
             ),
             subtitle: Text(
-              'Тип: $desc',
+              desc,
+              maxLines: 2,
               style: Theme.of(context).textTheme.bodyText1?.copyWith(height: 1),
             ),
           ),
@@ -58,13 +59,13 @@ class LevelView extends StatelessWidget {
         alignment: Alignment.centerRight,
         child: FittedBox(
           child: Text(
-            'текущий результат',
+            result == null ? 'попробуй пройти!' : 'текущий результат',
             textAlign: TextAlign.end,
             style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
           ),
         ),
       ),
-      subtitle: Align(
+      subtitle: result == null ? null : Align(
         alignment: Alignment.centerRight,
         child: FittedBox(
           child: Text(

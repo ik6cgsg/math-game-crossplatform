@@ -67,7 +67,7 @@ class GameScreen extends StatelessWidget {
       ),
       itemBuilder: (ctx, i) => LevelView(
         i,
-        state.taskset.tasks[i].descriptionShortRu,
+        state.taskset.tasks[i].nameRu,
         state.results?.firstWhereOrNull((e) => e.taskCode == state.taskset.tasks[i].code),
         () {
           Navigator.of(ctx).pushNamed(PlayScreen.routeName, arguments: i).then((_) {

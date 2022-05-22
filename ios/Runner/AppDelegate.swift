@@ -43,7 +43,7 @@ import FirebaseCore
         let interactive = args?["interactive"] as? Bool ?? false
         if let ex = expression, let st = structured {
             let pair = MathResolver.companion.resolveToPlain(expression: ex, style: .default_,
-                taskType: taskType, structureString: st, customSymbolMap: nil)
+                taskType: taskType, structureString: st, customSymbolMap: nil, shrink: !interactive)
             if (interactive) {
                 self.currentExpressionPair = pair
             }
