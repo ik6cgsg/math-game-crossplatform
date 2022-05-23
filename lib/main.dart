@@ -40,28 +40,28 @@ class MyApp extends StatelessWidget {
           textTheme: const TextTheme(
               bodyText1: TextStyle(
                 fontFamily: 'NotoSansMono',
-                fontSize: 13,
+                fontSize: 18,
                 height: 0.69,
                 color: Colors.black,
                 fontWeight: FontWeight.normal,
               ),
               bodyText2: TextStyle(
                 fontFamily: 'NotoSansMono',
-                fontSize: 13,
+                fontSize: 18,
                 height: 0.69,
                 color: Colors.teal,
                 fontWeight: FontWeight.bold,
               ),
               headline2: TextStyle(
                 fontFamily: 'NotoSansMono',
-                fontSize: 15,
+                fontSize: 16,
                 height: 1,
                 color: Colors.red,
                 fontWeight: FontWeight.normal,
               ),
               headline1: TextStyle(
                   fontFamily: 'NotoSansMono',
-                  fontSize: 15,
+                  fontSize: 16,
                   color: Colors.blueAccent,
                   fontWeight: FontWeight.bold
               )

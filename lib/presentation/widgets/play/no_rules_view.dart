@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart' hide Step;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:math_game_crossplatform/presentation/blocs/play/play_bloc.dart';
@@ -32,24 +33,45 @@ class _NoRulesViewState extends State<NoRulesView> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     final playBloc = BlocProvider.of<PlayBloc>(context, listen: true);
+    var group = AutoSizeGroup();
+    var subGroup = AutoSizeGroup();
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         FadeTransition(
           opacity: Tween<double>(begin: 1, end: 0.1).animate(_controller),
-          child: Text(
-            'Нет правил.\nВыбери узел\nв выражении!',
-            textAlign: TextAlign.start,
+          child: AutoSizeText(
+            'Сведи выражение к цели сверху:\n'
+            '👇 Кликни место в выражении\n'
+            '🤔 Выбери преобразование из появившихся\n'
+            '✨ Выражение автоматически преобразуется',
+            textAlign: TextAlign.left,
             style: Theme.of(context).textTheme.headline1,
+            minFontSize: 7,
+            maxLines: 4,
           )
         ),
         Column(
           children: [
             Card(
               child: ListTile(
-                title: Text('Режим мультивыбора'),
-                subtitle: Text('включается также долгим нажатием'),
+                title: AutoSizeText(
+                  'Режим мультивыделения',
+                  maxLines: 2,
+                  wrapWords: false,
+                  minFontSize: 5,
+                  maxFontSize: 16,
+                  group: group,
+                ),
+                subtitle: AutoSizeText(
+                  'Для выделения нескольких мест в выражении',
+                  maxLines: 2,
+                  wrapWords: false,
+                  minFontSize: 5,
+                  maxFontSize: 13,
+                  group: subGroup,
+                ),
                 trailing: Switch(
                   value: (playBloc.state as Step).state.multiselectMode,
                   onChanged: (_) {
@@ -60,8 +82,8 @@ class _NoRulesViewState extends State<NoRulesView> with TickerProviderStateMixin
             ),
             Card(
               child: ListTile(
-                title: Text('Текущий результат'),
-                subtitle: Text('${(playBloc.state as Step).state.stepCount} шагов'),
+                title: AutoSizeText('Текущий результат', group: group,),
+                subtitle: AutoSizeText('${(playBloc.state as Step).state.stepCount} 👣', group: subGroup,),
               ),
             ),
           ]

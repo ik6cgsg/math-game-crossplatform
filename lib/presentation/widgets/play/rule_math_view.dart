@@ -50,15 +50,15 @@ class RuleMathView extends StatelessWidget {
         child: InkWell(
           borderRadius: const BorderRadius.all(Radius.circular(UIConstants.borderRadius)),
           onTap: onTap,
-          child:  Container(
+          child: Container(
             width: constraints.maxWidth,
             alignment: Alignment.center,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.all(10),
               child: Text(
-                  output,
-                  style: Theme.of(context).textTheme.bodyText1
+                output,
+                style: Theme.of(context).textTheme.bodyText1
               ),
             ),
           ),

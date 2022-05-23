@@ -46,7 +46,7 @@ class TaskDescriptionView extends StatelessWidget {
       ) :
       Container(
         width: maxW,
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 5),
         child: Center(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -63,20 +63,20 @@ class TaskDescriptionView extends StatelessWidget {
   List<Widget> _children(BuildContext context, String descr, String output) {
     final textTheme = Theme.of(context).textTheme;
     return [
-      const SizedBox(height: 10, width: 10,),
+      const SizedBox(height: 5, width: 5,),
       Text(
         descr,
         style: textTheme.headline1?.copyWith(height: textTheme.bodyText1!.height),
         textAlign: TextAlign.center,
       ),
-      const SizedBox(height: 10, width: 10,),
+      const SizedBox(height: 5, width: 5,),
       output.isNotEmpty ?
       Text(
         output,
         style: textTheme.bodyText1,
       ) :
       Container(),
-      output.isNotEmpty ? const SizedBox(height: 10, width: 10,) : Container(),
+      output.isNotEmpty ? const SizedBox(height: 5, width: 5,) : Container(),
     ];
   }
 

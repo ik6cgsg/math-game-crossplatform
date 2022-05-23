@@ -1,5 +1,7 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:math_game_crossplatform/domain/entities/result.dart';
+import 'package:math_game_crossplatform/main.dart';
 
 class LevelView extends StatelessWidget {
   final int index;
@@ -19,9 +21,11 @@ class LevelView extends StatelessWidget {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headline1,
             ),
-            subtitle: Text(
+            subtitle: AutoSizeText(
               desc,
               maxLines: 2,
+              wrapWords: false,
+              maxFontSize: 14,
               style: Theme.of(context).textTheme.bodyText1?.copyWith(height: 1),
             ),
           ),
@@ -43,35 +47,39 @@ class LevelView extends StatelessWidget {
   }
 
   Widget _resultFooter(BuildContext context) {
-    return GridTileBar(
-      leading: Icon(
-        result?.state == LevelState.locked ?
-        Icons.lock_outline_rounded :
-        result?.state == LevelState.paused ?
-          Icons.pause_rounded :
-        result?.state == LevelState.passed ?
-          Icons.done_rounded:
-          Icons.play_arrow_rounded,
-        color: Theme.of(context).primaryColor,
-        size: 30,
-      ),
-      title: Align(
-        alignment: Alignment.centerRight,
-        child: FittedBox(
-          child: Text(
+    var myGroup = AutoSizeGroup();
+    return SizedBox(
+      height: 50,
+      child: GridTileBar(
+        leading: Icon(
+          result?.state == LevelState.locked ?
+          Icons.lock_outline_rounded :
+          result?.state == LevelState.paused ?
+            Icons.pause_rounded :
+          result?.state == LevelState.passed ?
+            Icons.done_rounded:
+            Icons.play_arrow_rounded,
+          color: Theme.of(context).primaryColor,
+          size: 30,
+        ),
+        title: Align(
+          alignment: Alignment.centerRight,
+          child: AutoSizeText(
             result == null ? 'попробуй пройти!' : 'текущий результат',
-            textAlign: TextAlign.end,
-            style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 12, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.headline1,
+            minFontSize: 9,
+            maxLines: 1,
+            group: myGroup,
           ),
         ),
-      ),
-      subtitle: result == null ? null : Align(
-        alignment: Alignment.centerRight,
-        child: FittedBox(
-          child: Text(
-            '${result?.stepCount ?? '―'} шагов',
-            textAlign: TextAlign.end,
-            style: Theme.of(context).textTheme.bodyText1?.copyWith(height: 1, fontSize: 15),
+        subtitle: result == null ? Container() : Align(
+          alignment: Alignment.centerRight,
+          child: AutoSizeText(
+            '${result?.stepCount ?? '―'} 👣',
+            style: Theme.of(context).textTheme.bodyText1?.copyWith(height: 1),
+            minFontSize: 9,
+            maxLines: 1,
+            group: myGroup,
           ),
         ),
       ),
