@@ -73,7 +73,10 @@ class _PassedViewState extends State<PassedView> {
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(smile),
+            child: Text(
+              smile,
+              style: Theme.of(context).textTheme.headline1,
+            ),
           ),
         )
     );

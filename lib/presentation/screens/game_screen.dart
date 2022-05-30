@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +15,9 @@ import '../../di.dart';
 import '../blocs/game/game_bloc.dart';
 
 class GameScreen extends StatelessWidget {
+  static final descriptionGroup = AutoSizeGroup();
+  static final titleGroup = AutoSizeGroup();
+
   const GameScreen({Key? key}) : super(key: key);
 
   @override
@@ -22,7 +26,7 @@ class GameScreen extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-            'Уровни',
+            'Substify: Logic',
             style: Theme.of(context).textTheme.headline1!.copyWith(color: Theme.of(context).backgroundColor)
         ),
       ),
@@ -66,10 +70,12 @@ class GameScreen extends StatelessWidget {
         childAspectRatio: 3 / 2,
       ),
       itemBuilder: (ctx, i) => LevelView(
-        i,
-        state.taskset.tasks[i].nameRu,
-        state.results?.firstWhereOrNull((e) => e.taskCode == state.taskset.tasks[i].code),
-        () {
+        index: i,
+        desc: state.taskset.tasks[i].nameRu,
+        result: state.results?.firstWhereOrNull((e) => e.taskCode == state.taskset.tasks[i].code),
+        descGroup: descriptionGroup,
+        titleGroup: titleGroup,
+        onTap: () {
           Navigator.of(ctx).pushNamed(PlayScreen.routeName, arguments: i).then((_) {
             di<RemoteRepository>().logEvent(const StatisticActionScreenClose('PlayScreen'));
             BlocProvider.of<GameBloc>(context).add(LoadTasksetEvent());
