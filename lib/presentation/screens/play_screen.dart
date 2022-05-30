@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -72,23 +73,25 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
-    var index = '';
+    String? name;
     final playBloc = BlocProvider.of<PlayBloc>(context, listen: true);
     if (playBloc.state is !Loading) {
-      index = playBloc.levelIndex.toString();
+      name = playBloc.nameRu;
     }
     return AppBar(
-      title: Text(
-          'Уровень #$index',
-          style: Theme.of(context).textTheme.headline1!
-              .copyWith(color: Theme.of(context).backgroundColor)
+      title: name == null ? null : AutoSizeText(
+        name,
+        style: Theme.of(context).textTheme.headline1!
+            .copyWith(color: Theme.of(context).backgroundColor),
+        minFontSize: 5,
+        maxLines: 2,
       ),
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh_rounded),
           color: Theme.of(context).backgroundColor,
           tooltip: 'Перезапуск уровня',
-          onPressed: int.tryParse(index) == null ? null : () {
+          onPressed: name == null ? null : () {
             di<RemoteRepository>().logEvent(StatisticActionRestart(playBloc.levelCode, playBloc.levelIndex));
             playBloc.add(RestartEvent());
           },

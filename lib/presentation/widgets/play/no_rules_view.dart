@@ -35,9 +35,11 @@ class _NoRulesViewState extends State<NoRulesView> with TickerProviderStateMixin
     final playBloc = BlocProvider.of<PlayBloc>(context, listen: true);
     var group = AutoSizeGroup();
     var subGroup = AutoSizeGroup();
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return ListView(
+      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      //crossAxisAlignment: CrossAxisAlignment.center,
+      //itemExtent: 50,
+      shrinkWrap: true,
       children: [
         FadeTransition(
           opacity: Tween<double>(begin: 1, end: 0.1).animate(_controller),
@@ -48,29 +50,43 @@ class _NoRulesViewState extends State<NoRulesView> with TickerProviderStateMixin
             '✨ Выражение автоматически преобразуется',
             textAlign: TextAlign.left,
             style: Theme.of(context).textTheme.headline1,
-            minFontSize: 7,
+            minFontSize: 5,
             maxLines: 4,
           )
         ),
+        SizedBox.square(dimension: 30,),
         Column(
           children: [
             Card(
               child: ListTile(
-                title: AutoSizeText(
-                  'Режим мультивыделения',
-                  maxLines: 2,
-                  wrapWords: false,
-                  minFontSize: 5,
-                  maxFontSize: 16,
-                  group: group,
+                horizontalTitleGap: 10,
+                title: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: AutoSizeText(
+                    'Режим мультивыделения',
+                    maxLines: 2,
+                    wrapWords: false,
+                    minFontSize: 5,
+                    maxFontSize: 16,
+                    group: group,
+                    style: const TextStyle(
+                      height: 1,
+                    )
+                  ),
                 ),
-                subtitle: AutoSizeText(
-                  'Для выделения нескольких мест в выражении',
-                  maxLines: 2,
-                  wrapWords: false,
-                  minFontSize: 5,
-                  maxFontSize: 13,
-                  group: subGroup,
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: AutoSizeText(
+                    'Для выделения нескольких мест в выражении',
+                    maxLines: 2,
+                    wrapWords: false,
+                    minFontSize: 5,
+                    maxFontSize: 13,
+                    group: subGroup,
+                    style: const TextStyle(
+                      height: 1,
+                    ),
+                  ),
                 ),
                 trailing: Switch(
                   value: (playBloc.state as Step).state.multiselectMode,
@@ -82,8 +98,26 @@ class _NoRulesViewState extends State<NoRulesView> with TickerProviderStateMixin
             ),
             Card(
               child: ListTile(
-                title: AutoSizeText('Текущий результат', group: group,),
-                subtitle: AutoSizeText('${(playBloc.state as Step).state.stepCount} 👣', group: subGroup,),
+                title: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: AutoSizeText(
+                    'Текущий результат',
+                    group: group,
+                    style: const TextStyle(
+                      height: 1,
+                    ),
+                  ),
+                ),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: AutoSizeText(
+                    '${(playBloc.state as Step).state.stepCount} 👣',
+                    group: subGroup,
+                    style: const TextStyle(
+                      height: 1,
+                    ),
+                  ),
+                ),
               ),
             ),
           ]
